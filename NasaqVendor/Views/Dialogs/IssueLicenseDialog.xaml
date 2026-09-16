@@ -1,0 +1,163 @@
+<Window x:Class="NasaqVendor.Views.Dialogs.IssueLicenseDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Style="{StaticResource BaseWindowStyle}"
+        Title="إصدار ترخيص"
+        Width="720"
+        Height="640"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Border CornerRadius="14"
+            Background="{StaticResource CardSurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            Margin="16">
+        <Border.Effect>
+            <DropShadowEffect Color="#1B3A57" BlurRadius="36" ShadowDepth="0" Opacity="0.22" />
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Padding="22,18,22,8" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <StackPanel>
+                    <TextBlock Text="إصدار ترخيص جديد" Style="{StaticResource SubheadTextStyle}" />
+                    <TextBlock Text="املأ بيانات الترخيص ثم احفظ ملف .naslic" Style="{StaticResource MutedTextStyle}" />
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="22,8,22,16">
+
+                    <!-- Customer -->
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="العميل" Style="{StaticResource FieldLabel}" />
+                        <ComboBox ItemsSource="{Binding Customers}"
+                                  SelectedItem="{Binding SelectedCustomer}"
+                                  IsEditable="True"
+                                  IsTextSearchEnabled="True"
+                                  TextSearch.TextPath="Name"
+                                  DisplayMemberPath="Name" />
+                    </StackPanel>
+
+                    <!-- Edition -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="الإصدار" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding Editions}"
+                                      SelectedItem="{Binding Edition}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource EditionToArabic}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="ينتهي في" Style="{StaticResource FieldLabel}" />
+                            <Grid>
+                                <DatePicker SelectedDate="{Binding ExpiresAtLocal}"
+                                            IsEnabled="{Binding NoExpiration, Converter={StaticResource InverseBool}}" />
+                            </Grid>
+                            <CheckBox Content="بلا انتهاء"
+                                      IsChecked="{Binding NoExpiration}"
+                                      Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Machine hashes -->
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="بصمات الجهاز (5 أسطر، 64 خانة hex لكل سطر)" Style="{StaticResource FieldLabel}" />
+                        <TextBox Text="{Binding MachineHashesText, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="NoWrap"
+                                 FontFamily="Consolas, Courier New, monospace"
+                                 FontSize="{StaticResource FontSizeSm}"
+                                 MinHeight="120"
+                                 MaxHeight="160"
+                                 VerticalScrollBarVisibility="Auto"
+                                 HorizontalScrollBarVisibility="Auto" />
+                        <TextBlock Text="{Binding HashValidationText}"
+                                   Margin="0,6,0,0"
+                                   FontSize="{StaticResource FontSizeSm}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HashesValid}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- Features -->
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="الميزات المُفعَّلة" Style="{StaticResource FieldLabel}" />
+                        <Border BorderBrush="{StaticResource BorderStrongBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="12">
+                            <ItemsControl ItemsSource="{Binding Features}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Content="{Binding Label}"
+                                                  Margin="0,4,16,4" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </StackPanel>
+
+                    <Border Background="{StaticResource DangerSoftBrush}"
+                            CornerRadius="6"
+                            Padding="10,8"
+                            Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}">
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border Grid.Row="2"
+                    Background="#F8FAFC"
+                    CornerRadius="0,0,14,14"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="22,14">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Style="{StaticResource SecondaryButton}"
+                            Content="إلغاء"
+                            Command="{Binding CancelCommand}"
+                            IsCancel="True"
+                            Padding="22,8"
+                            Margin="0,0,10,0" />
+                    <Button Style="{StaticResource PrimaryButton}"
+                            Content="إصدار وحفظ كملف…"
+                            Command="{Binding SaveCommand}"
+                            IsDefault="True"
+                            Padding="26,8" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

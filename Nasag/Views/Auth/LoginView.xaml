@@ -1,0 +1,288 @@
+<Window x:Class="Nasag.Views.Auth.LoginView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:Nasag.ViewModels.Auth"
+        xmlns:controls="clr-namespace:Nasag.Controls"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:LoginViewModel}"
+        Style="{StaticResource BaseWindowStyle}"
+        Title="نَسَق — تسجيل الدخول"
+        Height="760" Width="1180"
+        MinHeight="640" MinWidth="960"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized">
+
+    <!--
+        IMPORTANT: This Window inherits FlowDirection="RightToLeft" from BaseWindowStyle.
+        Under RTL, HorizontalAlignment/TextAlignment are MIRRORED:
+            HorizontalAlignment="Left"  -> visually RIGHT (RTL start)
+            HorizontalAlignment="Right" -> visually LEFT  (RTL end)
+        That's why all "visually right" elements here use HorizontalAlignment="Left".
+    -->
+
+    <Window.Background>
+        <ImageBrush ImageSource="pack://application:,,,/Assets/Images/LoginBackground.png"
+                    Stretch="UniformToFill" />
+    </Window.Background>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ============ Header strip (visually right side under RTL) ============ -->
+        <Border Grid.Row="0"
+                Background="Transparent"
+                Padding="28,18">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center">
+                <Image Source="pack://application:,,,/Assets/Images/Logo.png"
+                       Width="28" Height="28"
+                       FlowDirection="LeftToRight" />
+                <TextBlock Text="{Binding AppName}"
+                           FontFamily="{StaticResource TajawalFont}"
+                           FontSize="{StaticResource FontSizeMd}"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           VerticalAlignment="Center"
+                           Margin="10,0,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- ============ Centered card ============ -->
+        <Border Grid.Row="1"
+                Background="{StaticResource CardSurfaceBrush}"
+                CornerRadius="{StaticResource RadiusLg}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                Width="480"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Padding="44,36,44,36">
+            <Border.Effect>
+                <DropShadowEffect Color="#1B3A57"
+                                  BlurRadius="40"
+                                  Opacity="0.12"
+                                  ShadowDepth="0" />
+            </Border.Effect>
+
+            <StackPanel>
+
+                <!-- Wordmark + heading (always center-aligned) -->
+                <Image Source="pack://application:,,,/Assets/Images/Logo.png"
+                       Width="74" Height="74"
+                       FlowDirection="LeftToRight"
+                       HorizontalAlignment="Center" />
+
+                <TextBlock Text="{Binding AppName}"
+                           FontFamily="{StaticResource TajawalFont}"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="0,14,0,4" />
+
+                <TextBlock Text="كل بيانات المدرسة في نظام واحد بسيط"
+                           FontFamily="{StaticResource TajawalFont}"
+                           FontSize="{StaticResource FontSizeSm}"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,26" />
+
+                <!-- ============ Connection bar (database picker + add) ============ -->
+                <Border Background="{StaticResource BackgroundBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource RadiusSm}"
+                        Padding="10,6"
+                        Margin="0,0,0,18"
+                        Visibility="{Binding Registry.IsEmpty, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Database icon + caption (visually right under RTL) -->
+                        <StackPanel Grid.Column="0"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="4,0,8,0">
+                            <Path Data="{StaticResource IconBackup}"
+                                  Stroke="{StaticResource TealPressedBrush}"
+                                  StrokeThickness="1.6"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="16" Height="16"
+                                  VerticalAlignment="Center" />
+                            <TextBlock Text="قاعدة البيانات:"
+                                       Style="{StaticResource MutedTextStyle}"
+                                       VerticalAlignment="Center"
+                                       Margin="6,0,0,0" />
+                        </StackPanel>
+
+                        <!-- Picker -->
+                        <controls:SearchableComboBox Grid.Column="1"
+                                                     ItemsSource="{Binding AvailableConnections}"
+                                                     SelectedItem="{Binding SelectedConnection, Mode=TwoWay}"
+                                                     DisplayMemberPath="DisplayName"
+                                                     Placeholder="اختر قاعدة"
+                                                     Margin="8,0,8,0"
+                                                     VerticalAlignment="Center" />
+
+                        <!-- Add button -->
+                        <Button Grid.Column="2"
+                                Style="{StaticResource GhostButton}"
+                                Command="{Binding AddConnectionCommand}"
+                                Padding="10,6"
+                                ToolTip="إضافة قاعدة بيانات جديدة">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Path Data="{StaticResource IconAdd}"
+                                      Stroke="{StaticResource TealPressedBrush}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Fill="Transparent"
+                                      Stretch="Uniform"
+                                      Width="14" Height="14"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="إضافة"
+                                           FontFamily="{StaticResource TajawalFont}"
+                                           FontSize="{StaticResource FontSizeSm}"
+                                           Foreground="{StaticResource TealPressedBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Error banner (text reads RTL naturally; TextAlignment omitted to let default L → visual R) -->
+                <Border Background="#FEE2E2"
+                        BorderBrush="#FCA5A5"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource RadiusSm}"
+                        Padding="14,10"
+                        Margin="0,0,0,16"
+                        Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="#B91C1C"
+                               FontFamily="{StaticResource TajawalFont}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               TextWrapping="Wrap" />
+                </Border>
+
+                <!-- Username (HorizontalAlignment="Left" mirrors to visual RIGHT under RTL flow) -->
+                <TextBlock Text="اسم المستخدم"
+                           Style="{StaticResource FieldLabel}"
+                           HorizontalAlignment="Left" />
+                <Grid Margin="0,0,0,16">
+                    <TextBox x:Name="UsernameField"
+                             Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                             Padding="44,8,12,8"
+                             MinHeight="44" />
+                    <!-- Icon visually RIGHT = HorizontalAlignment=Left under RTL -->
+                    <Path Data="{StaticResource IconUser}"
+                          Stroke="{StaticResource TextMutedBrush}"
+                          StrokeThickness="1.6"
+                          Fill="Transparent"
+                          Stretch="Uniform"
+                          Width="18" Height="18"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
+                          Margin="14,0,0,0"
+                          IsHitTestVisible="False" />
+                </Grid>
+
+                <!-- Password -->
+                <TextBlock Text="كلمة المرور"
+                           Style="{StaticResource FieldLabel}"
+                           HorizontalAlignment="Left" />
+                <Grid Margin="0,0,0,14">
+                    <PasswordBox x:Name="PasswordField"
+                                 PasswordChanged="PasswordField_OnPasswordChanged"
+                                 Padding="44,8,12,8"
+                                 MinHeight="44" />
+                    <Path Data="{StaticResource IconLock}"
+                          Stroke="{StaticResource TextMutedBrush}"
+                          StrokeThickness="1.6"
+                          Fill="Transparent"
+                          Stretch="Uniform"
+                          Width="18" Height="18"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
+                          Margin="14,0,0,0"
+                          IsHitTestVisible="False" />
+                </Grid>
+
+                <!-- Remember me (visually right under RTL) -->
+                <CheckBox Content="تذكّرني على هذا الجهاز"
+                          IsChecked="{Binding RememberMe}"
+                          FontFamily="{StaticResource TajawalFont}"
+                          FontSize="{StaticResource FontSizeSm}"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          HorizontalAlignment="Left"
+                          Margin="0,0,0,22" />
+
+                <!-- Login button (stretches full width of card) -->
+                <Button Style="{StaticResource NavyPrimaryButton}"
+                        Height="48"
+                        Command="{Binding LoginCommand}"
+                        IsDefault="True">
+                    <Grid>
+                        <TextBlock Text="تسجيل الدخول"
+                                   Foreground="{StaticResource TextOnPrimaryBrush}"
+                                   FontWeight="Medium"
+                                   FontSize="{StaticResource FontSizeMd}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Visibility="{Binding IsBusy, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                        <TextBlock Text="جاري التحقق…"
+                                   Foreground="{StaticResource TextOnPrimaryBrush}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+                </Button>
+
+                <!-- Alternate sign-in link (center) -->
+                <TextBlock HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           Margin="0,18,0,0"
+                           FontFamily="{StaticResource TajawalFont}"
+                           FontSize="{StaticResource FontSizeSm}">
+                    <Run Text="تسجيل الدخول بحساب آخر؟"
+                         Foreground="{StaticResource TealPrimaryBrush}"
+                         Cursor="Hand" />
+                </TextBlock>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ============ Footer strip ============ -->
+        <Grid Grid.Row="2" Margin="28,0,28,18">
+            <!-- "الدعم والمساعدة" visually right (RTL start) -->
+            <TextBlock Text="الدعم والمساعدة"
+                       HorizontalAlignment="Left"
+                       FontFamily="{StaticResource TajawalFont}"
+                       FontSize="{StaticResource FontSizeSm}"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       Cursor="Hand" />
+            <!-- "سياسة الخصوصية" visually left (RTL end) -->
+            <TextBlock Text="سياسة الخصوصية"
+                       HorizontalAlignment="Right"
+                       FontFamily="{StaticResource TajawalFont}"
+                       FontSize="{StaticResource FontSizeSm}"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       Cursor="Hand" />
+        </Grid>
+    </Grid>
+</Window>

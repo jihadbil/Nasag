@@ -1,0 +1,158 @@
+<Window x:Class="Nasag.Views.Splash.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:helpers="clr-namespace:Nasag.Helpers"
+        mc:Ignorable="d"
+        Style="{StaticResource BaseWindowStyle}"
+        Title="نَسَق"
+        FlowDirection="RightToLeft"
+        Width="520"
+        Height="380"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <Border CornerRadius="14"
+            Background="{StaticResource CardSurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            Margin="16"
+            MouseLeftButtonDown="OnBodyMouseLeftButtonDown">
+        <Border.Effect>
+            <DropShadowEffect Color="#1B3A57" BlurRadius="36" ShadowDepth="0" Opacity="0.22" />
+        </Border.Effect>
+
+        <Grid Margin="28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Logo bubble -->
+            <Border Grid.Row="0"
+                    Width="80" Height="80"
+                    CornerRadius="999"
+                    Background="{StaticResource TealPrimaryBrush}"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,16">
+                <TextBlock Text="ن"
+                           FontFamily="{StaticResource TajawalFont}"
+                           FontSize="42"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+
+            <!-- Title -->
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center">
+                <TextBlock Text="نَسَق"
+                           FontFamily="{StaticResource TajawalFont}"
+                           FontSize="{StaticResource FontSize3xl}"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="نظام إدارة المدارس"
+                           Style="{StaticResource MutedTextStyle}"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0" />
+            </StackPanel>
+
+            <!-- Status / Error region -->
+            <Grid Grid.Row="3"
+                  VerticalAlignment="Center"
+                  Margin="0,16,0,0">
+
+                <!-- Working state -->
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding HasError, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <Grid x:Name="Spinner" Width="36" Height="36" RenderTransformOrigin="0.5,0.5"
+                          HorizontalAlignment="Center">
+                        <Grid.RenderTransform>
+                            <RotateTransform x:Name="SpinnerRotate" Angle="0" />
+                        </Grid.RenderTransform>
+                        <Grid.Triggers>
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="SpinnerRotate"
+                                                         Storyboard.TargetProperty="Angle"
+                                                         From="0" To="360" Duration="0:0:1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Grid.Triggers>
+                        <Ellipse Stroke="{StaticResource BorderBrush}" StrokeThickness="3" />
+                        <Path Stroke="{StaticResource TealPrimaryBrush}"
+                              StrokeThickness="3"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Data="M 18 2 A 16 16 0 0 1 34 18" />
+                    </Grid>
+                    <TextBlock Text="{Binding StatusMessage}"
+                               FontFamily="{StaticResource TajawalFont}"
+                               FontSize="{StaticResource FontSizeBase}"
+                               FontWeight="Medium"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               Margin="0,14,0,0" />
+                </StackPanel>
+
+                <!-- Error state -->
+                <StackPanel HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Border Background="{StaticResource DangerSoftBrush}"
+                            BorderBrush="{StaticResource DangerBrush}"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="14,12">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Width="20" Height="20"
+                                  Stretch="Uniform"
+                                  Stroke="{StaticResource DangerBrush}"
+                                  StrokeThickness="2"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"
+                                  Fill="Transparent"
+                                  Data="M12 8 V13 M12 17 H12.01 M2 20 L12 4 L22 20 Z"
+                                  VerticalAlignment="Top"
+                                  Margin="0,2,0,0" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Right"
+                                       MaxWidth="380"
+                                       Margin="10,0,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,16,0,0">
+                        <Button Style="{StaticResource PrimaryButton}"
+                                Content="إعادة المحاولة"
+                                Padding="22,8"
+                                Command="{Binding RetryCommand}" />
+                        <Button Style="{StaticResource SecondaryButton}"
+                                Content="فتح معالج الإعداد"
+                                Padding="22,8"
+                                Margin="10,0,0,0"
+                                Command="{Binding OpenSetupWizardCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

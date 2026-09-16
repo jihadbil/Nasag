@@ -1,0 +1,387 @@
+<Window x:Class="Nasag.Views.Shell.MainShellView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:Nasag.ViewModels.Shell"
+        xmlns:controls="clr-namespace:Nasag.Controls"
+        xmlns:helpers="clr-namespace:Nasag.Helpers"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainShellViewModel}"
+        Title="نَسَق لإدارة المدارس"
+        Height="800" Width="1366"
+        MinHeight="640" MinWidth="1100"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized">
+
+    <Window.Resources>
+        <helpers:ResourceKeyConverter x:Key="ResourceKeyConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ===================== Content area (left) ===================== -->
+        <DockPanel Grid.Column="0" LastChildFill="True">
+
+            <!-- Top bar -->
+            <Border DockPanel.Dock="Top"
+                    Background="{StaticResource CardSurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="22,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- User chip (RTL: appears on the right visually) -->
+                    <Border Grid.Column="0"
+                            Background="{StaticResource BackgroundBrush}"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="10,6">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="28" Height="28" CornerRadius="14"
+                                    Background="{StaticResource TealPrimaryBrush}">
+                                <TextBlock Text="{Binding UserInitial}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center" Margin="8,0,0,0">
+                                <TextBlock Text="{Binding UserDisplayName}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           FontWeight="Medium" />
+                                <TextBlock Text="{Binding UserRoleName}"
+                                           Style="{StaticResource MutedTextStyle}"
+                                           FontSize="{StaticResource FontSizeXs}" />
+                            </StackPanel>
+                            <Path Data="{StaticResource IconChevronDown}"
+                                  Stroke="{StaticResource TextSecondaryBrush}"
+                                  StrokeThickness="1.6"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="12" Height="12"
+                                  Margin="8,0,0,0"
+                                  VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Year chip -->
+                    <Border Grid.Column="1"
+                            Background="{StaticResource BackgroundBrush}"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="10,6"
+                            Margin="10,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconCalendar}"
+                                  Stroke="{StaticResource TextSecondaryBrush}"
+                                  StrokeThickness="1.6"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="14" Height="14"
+                                  VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding AcademicYear}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- School chip -->
+                    <Border Grid.Column="2"
+                            Background="{StaticResource BackgroundBrush}"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="10,6"
+                            Margin="10,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconSchool}"
+                                  Stroke="{StaticResource TextSecondaryBrush}"
+                                  StrokeThickness="1.6"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="14" Height="14"
+                                  VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding SchoolName}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- License badge (Phase 14) -->
+                    <Border Grid.Column="3"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="10,6"
+                            Margin="10,0,0,0">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource InfoSoftBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LicenseBadgeKind}" Value="Activated">
+                                        <Setter Property="Background" Value="{StaticResource SuccessSoftBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LicenseBadgeKind}" Value="Trial">
+                                        <Setter Property="Background" Value="{StaticResource InfoSoftBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LicenseBadgeKind}" Value="Warning">
+                                        <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LicenseBadgeKind}" Value="Danger">
+                                        <Setter Property="Background" Value="{StaticResource DangerSoftBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconShield}"
+                                  StrokeThickness="1.6"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="14" Height="14"
+                                  VerticalAlignment="Center">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Stroke" Value="{StaticResource InfoBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding LicenseBadgeKind}" Value="Activated">
+                                                <Setter Property="Stroke" Value="{StaticResource SuccessBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding LicenseBadgeKind}" Value="Warning">
+                                                <Setter Property="Stroke" Value="{StaticResource WarningBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding LicenseBadgeKind}" Value="Danger">
+                                                <Setter Property="Stroke" Value="{StaticResource DangerBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                            <TextBlock Text="{Binding LicenseBadgeText}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Search box -->
+                    <Border Grid.Column="5"
+                            Background="{StaticResource BackgroundBrush}"
+                            CornerRadius="{StaticResource RadiusSm}"
+                            Padding="10,0"
+                            MinWidth="260"
+                            Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Path Grid.Column="0"
+                                  Data="{StaticResource IconSearch}"
+                                  Stroke="{StaticResource TextMutedBrush}"
+                                  StrokeThickness="1.6"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="16" Height="16"
+                                  VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     MinHeight="32"
+                                     VerticalContentAlignment="Center"
+                                     Margin="8,0,0,0"
+                                     Tag="بحث عام…" />
+                        </Grid>
+                    </Border>
+
+                    <Button Grid.Column="6"
+                            Style="{StaticResource IconButton}">
+                        <Path Data="{StaticResource IconBell}"
+                              Stroke="{StaticResource TextSecondaryBrush}"
+                              StrokeThickness="1.6"
+                              Fill="Transparent"
+                              Stretch="Uniform" />
+                    </Button>
+
+                    <Button Grid.Column="7"
+                            Style="{StaticResource IconButton}"
+                            Margin="6,0,0,0"
+                            ToolTip="تسجيل الخروج"
+                            Command="{Binding LogoutCommand}">
+                        <Path Data="{StaticResource IconLogout}"
+                              Stroke="{StaticResource TextSecondaryBrush}"
+                              StrokeThickness="1.6"
+                              Fill="Transparent"
+                              Stretch="Uniform" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Connection banner (sits under TopBar, above content) -->
+            <controls:ConnectionStatusBanner DockPanel.Dock="Top"
+                                             IsDisconnected="{Binding IsDisconnected}"
+                                             Message="{Binding ConnectionErrorMessage}"
+                                             RetryCommand="{Binding RetryConnectionCommand}" />
+
+            <!-- Page host -->
+            <Grid>
+                <ContentControl Content="{Binding CurrentPage}" />
+                <!--
+                    ToastHost spans the page area; the *inner* grid inside the host
+                    (FlowDirection=LeftToRight) anchors itself to its visual-left edge
+                    so toasts always appear in the visually-LEFT corner of the screen,
+                    independent of the parent's FlowDirection.
+                -->
+                <controls:ToastHost HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch" />
+            </Grid>
+        </DockPanel>
+
+        <!-- ===================== Sidebar (right) ===================== -->
+        <Border Grid.Column="1"
+                Width="{Binding SidebarWidth}"
+                Background="{StaticResource NavySidebarBrush}"
+                FlowDirection="RightToLeft">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0"
+                        Style="{StaticResource IconButton}"
+                        Width="30"
+                        Height="30"
+                        Padding="6"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="8"
+                        Background="#1E293B"
+                        ToolTip="{Binding SidebarToggleTooltip}"
+                        Command="{Binding ToggleSidebarCommand}">
+                    <Path Stroke="#94A3B8"
+                          StrokeThickness="1.8"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"
+                          StrokeLineJoin="Round"
+                          Fill="Transparent"
+                          Stretch="Uniform">
+                        <Path.Style>
+                            <Style TargetType="Path">
+                                <Setter Property="Data" Value="{StaticResource IconDoubleChevronEnd}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                        <Setter Property="Data" Value="{StaticResource IconDoubleChevronStart}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Path.Style>
+                    </Path>
+                </Button>
+
+                <!-- Brand block -->
+                <StackPanel Grid.Row="0"
+                            Margin="20,22,20,18"
+                            HorizontalAlignment="Center">
+                    <Image Source="pack://application:,,,/Assets/Images/Logo.png"
+                           FlowDirection="LeftToRight">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Width" Value="104" />
+                                <Setter Property="Height" Value="104" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                        <Setter Property="Width" Value="50" />
+                                        <Setter Property="Height" Value="50" />
+                                        <Setter Property="Margin" Value="0,10,0,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                    <TextBlock Text="{Binding AppName}"
+                               FontFamily="{StaticResource TajawalFont}"
+                               FontSize="{StaticResource FontSizeLg}"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               Margin="0,10,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Menu -->
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Margin="0,10,0,0">
+                    <ItemsControl ItemsSource="{Binding NavigationItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <controls:SidebarMenuItem
+                                        Label="{Binding TitleAr}"
+                                        IconGeometry="{Binding IconKey, Converter={StaticResource ResourceKeyConverter}}"
+                                        IsActive="{Binding IsActive}"
+                                        IsCollapsed="{Binding DataContext.IsSidebarCollapsed, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Command="{Binding Command}"
+                                        CommandParameter="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Footer card -->
+                <Border Grid.Row="2"
+                        Background="#1E293B"
+                        CornerRadius="{StaticResource RadiusMd}"
+                        Padding="14,12"
+                        Margin="14,12,14,16">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSidebarCollapsed}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel>
+                        <TextBlock Text="نَسَق لإدارة المدارس"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="{StaticResource FontSizeSm}"
+                                   FontWeight="Medium"
+                                   Foreground="White" />
+                        <TextBlock Text="الإصدار 0.1.0 — 2025/2026"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="{StaticResource FontSizeXs}"
+                                   Foreground="#94A3B8"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

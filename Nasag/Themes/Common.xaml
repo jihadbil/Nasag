@@ -1,0 +1,36 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        WPF implicit styles match on the runtime type, not inheritance.
+        A Style targeting `Window` does NOT apply to subclasses like MainShellView.
+        Use this keyed style on each Window: Style="{StaticResource BaseWindowStyle}".
+    -->
+    <Style x:Key="BaseWindowStyle" TargetType="Window">
+        <Setter Property="FontFamily" Value="{StaticResource TajawalFont}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+        <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <!-- Implicit defaults — these DO match standard primitive types correctly -->
+
+    <Style TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource TajawalFont}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+        <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+    </Style>
+
+    <Style TargetType="Control">
+        <Setter Property="FontFamily" Value="{StaticResource TajawalFont}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+    </Style>
+
+</ResourceDictionary>

@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:helpers="clr-namespace:Nasag.Helpers">
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+
+    <!-- Phase 10: Fees converters -->
+    <helpers:InstallmentStatusToArabicConverter x:Key="InstallmentStatusToArabic" />
+    <helpers:InstallmentStatusToBackgroundConverter x:Key="InstallmentStatusToBackground" />
+    <helpers:InstallmentStatusToForegroundConverter x:Key="InstallmentStatusToForeground" />
+    <helpers:PaymentMethodToArabicConverter x:Key="PaymentMethodToArabic" />
+    <helpers:DecimalToCurrencyArabicConverter x:Key="DecimalToCurrencyArabic" />
+    <helpers:InstallmentNotPaidToVisibilityConverter x:Key="InstallmentNotPaidToVisibility" />
+</ResourceDictionary>

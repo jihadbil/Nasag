@@ -1,0 +1,385 @@
+<UserControl x:Class="Nasag.Views.Pages.Reports.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:Nasag.ViewModels.Pages.Reports"
+             xmlns:helpers="clr-namespace:Nasag.Helpers"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ReportsViewModel}"
+             FontFamily="{StaticResource TajawalFont}"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+        <!-- Generic report card style -->
+        <Style x:Key="ReportCard" TargetType="Border" BasedOn="{StaticResource CardBorder}">
+            <Setter Property="Padding" Value="20,18" />
+            <Setter Property="MinHeight" Value="200" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="22,18,22,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: Page header (canonical FlowDirection swap) -->
+        <Grid Grid.Row="0" Margin="0,0,0,14" FlowDirection="LeftToRight">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="1"
+                        FlowDirection="RightToLeft"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                <TextBlock Text="{Binding TitleAr}"
+                           Style="{StaticResource SectionTitle}"
+                           TextAlignment="Right"
+                           HorizontalAlignment="Right" />
+                <TextBlock Text="{Binding SubtitleAr}"
+                           Style="{StaticResource SectionSubtitle}"
+                           TextAlignment="Right"
+                           HorizontalAlignment="Right"
+                           Margin="0,2,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Row 1: 4 report cards (2x2 via UniformGrid) -->
+        <UniformGrid Grid.Row="1"
+                     Rows="2" Columns="2"
+                     Margin="0,0,0,14">
+
+            <!-- Card 1: Students (Teal) -->
+            <Border Style="{StaticResource ReportCard}" Margin="0,0,8,8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Width="60" Height="60"
+                            CornerRadius="30"
+                            Background="{StaticResource TealSoftBrush}"
+                            HorizontalAlignment="Right">
+                        <Path Data="{StaticResource IconStudents}"
+                              Stroke="{StaticResource TealPressedBrush}"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="28" Height="28" />
+                    </Border>
+
+                    <TextBlock Grid.Row="1"
+                               Text="تقرير الطلاب"
+                               FontSize="{StaticResource FontSizeLg}"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,14,0,4" />
+
+                    <TextBlock Grid.Row="2"
+                               Text="قائمة الطلاب مع تصفية حسب الصف والشعبة والحالة."
+                               Style="{StaticResource MutedTextStyle}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Top" />
+
+                    <Button Grid.Row="3"
+                            Style="{StaticResource BubbleButton}"
+                            Command="{Binding OpenStudentsReportCommand}"
+                            HorizontalAlignment="Right"
+                            Padding="18,8"
+                            Margin="0,12,0,0"
+                            Content="إنشاء التقرير" />
+                </Grid>
+            </Border>
+
+            <!-- Card 2: Attendance (Success green) -->
+            <Border Style="{StaticResource ReportCard}" Margin="8,0,0,8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Width="60" Height="60"
+                            CornerRadius="30"
+                            Background="{StaticResource SuccessSoftBrush}"
+                            HorizontalAlignment="Right">
+                        <Path Data="{StaticResource IconAttendance}"
+                              Stroke="{StaticResource SuccessBrush}"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="28" Height="28" />
+                    </Border>
+
+                    <TextBlock Grid.Row="1"
+                               Text="كشف الحضور والغياب"
+                               FontSize="{StaticResource FontSizeLg}"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,14,0,4" />
+
+                    <TextBlock Grid.Row="2"
+                               Text="ملخص حضور الطلاب لفترة زمنية مع نسب الحضور."
+                               Style="{StaticResource MutedTextStyle}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Top" />
+
+                    <Button Grid.Row="3"
+                            Style="{StaticResource BubbleButton}"
+                            Command="{Binding OpenAttendanceReportCommand}"
+                            HorizontalAlignment="Right"
+                            Padding="18,8"
+                            Margin="0,12,0,0"
+                            Content="إنشاء التقرير" />
+                </Grid>
+            </Border>
+
+            <!-- Card 3: Marks (Info blue) -->
+            <Border Style="{StaticResource ReportCard}" Margin="0,8,8,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Width="60" Height="60"
+                            CornerRadius="30"
+                            Background="{StaticResource InfoSoftBrush}"
+                            HorizontalAlignment="Right">
+                        <Path Data="{StaticResource IconReports}"
+                              Stroke="{StaticResource InfoBrush}"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="28" Height="28" />
+                    </Border>
+
+                    <TextBlock Grid.Row="1"
+                               Text="كشف الدرجات"
+                               FontSize="{StaticResource FontSizeLg}"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,14,0,4" />
+
+                    <TextBlock Grid.Row="2"
+                               Text="نتائج الطلاب لامتحان محدد أو إجمالي السنة."
+                               Style="{StaticResource MutedTextStyle}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Top" />
+
+                    <Button Grid.Row="3"
+                            Style="{StaticResource BubbleButton}"
+                            Command="{Binding OpenMarksReportCommand}"
+                            HorizontalAlignment="Right"
+                            Padding="18,8"
+                            Margin="0,12,0,0"
+                            Content="إنشاء التقرير" />
+                </Grid>
+            </Border>
+
+            <!-- Card 4: Fees (Warning amber) -->
+            <Border Style="{StaticResource ReportCard}" Margin="8,8,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Width="60" Height="60"
+                            CornerRadius="30"
+                            Background="{StaticResource WarningSoftBrush}"
+                            HorizontalAlignment="Right">
+                        <Path Data="{StaticResource IconFees}"
+                              Stroke="{StaticResource WarningBrush}"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="28" Height="28" />
+                    </Border>
+
+                    <TextBlock Grid.Row="1"
+                               Text="كشف الرسوم"
+                               FontSize="{StaticResource FontSizeLg}"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,14,0,4" />
+
+                    <TextBlock Grid.Row="2"
+                               Text="رسوم الطلاب وحالة السداد مع المتأخرات."
+                               Style="{StaticResource MutedTextStyle}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Top" />
+
+                    <Button Grid.Row="3"
+                            Style="{StaticResource BubbleButton}"
+                            Command="{Binding OpenFeesReportCommand}"
+                            HorizontalAlignment="Right"
+                            Padding="18,8"
+                            Margin="0,12,0,0"
+                            Content="إنشاء التقرير" />
+                </Grid>
+            </Border>
+        </UniformGrid>
+
+        <!-- Row 2: Recent reports -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorder}" Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0"
+                        Padding="16,12"
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{StaticResource BorderBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="آخر التقارير المولَّدة"
+                                       Style="{StaticResource SectionTitle}"
+                                       FontSize="{StaticResource FontSizeLg}"
+                                       VerticalAlignment="Center" />
+                            <Border Background="{StaticResource TealSoftBrush}"
+                                    CornerRadius="10"
+                                    Padding="10,3"
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding RecentReports.Count}"
+                                           Foreground="{StaticResource TealPressedBrush}"
+                                           FontWeight="Bold"
+                                           FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                        </StackPanel>
+
+                        <Button Grid.Column="1"
+                                Style="{StaticResource GhostButton}"
+                                Command="{Binding ClearRecentCommand}"
+                                Padding="12,6"
+                                Content="مسح القائمة"
+                                Visibility="{Binding HasRecentReports, Converter={StaticResource BoolToVisibility}}" />
+                    </Grid>
+                </Border>
+
+                <!-- DataGrid (populated state) -->
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding RecentReports}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          HeadersVisibility="Column"
+                          IsReadOnly="True"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          Visibility="{Binding HasRecentReports, Converter={StaticResource BoolToVisibility}}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="النوع"
+                                            Binding="{Binding TitleAr}"
+                                            Width="160" />
+                        <DataGridTextColumn Header="الوصف"
+                                            Binding="{Binding DescriptionAr}"
+                                            Width="*" />
+                        <DataGridTextColumn Header="المستخدم"
+                                            Binding="{Binding UserName}"
+                                            Width="140" />
+                        <DataGridTextColumn Header="التاريخ"
+                                            Binding="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                            Width="140" />
+
+                        <DataGridTemplateColumn Header="إجراءات" Width="110">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal"
+                                                FlowDirection="RightToLeft"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center">
+                                        <Button Style="{StaticResource RowActionButton}"
+                                                Command="{Binding DataContext.ReopenRecentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="إعادة فتح">
+                                            <Path Data="{StaticResource IconRefresh}"
+                                                  Stroke="{StaticResource InfoBrush}"
+                                                  StrokeThickness="1.6"
+                                                  Fill="Transparent"
+                                                  Stretch="Uniform"
+                                                  Width="14" Height="14" />
+                                        </Button>
+                                        <Button Style="{StaticResource RowActionButton}"
+                                                Command="{Binding DataContext.RemoveRecentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="6,0,0,0"
+                                                ToolTip="حذف من القائمة">
+                                            <Path Data="{StaticResource IconDelete}"
+                                                  Stroke="{StaticResource DangerBrush}"
+                                                  StrokeThickness="1.7"
+                                                  Fill="Transparent"
+                                                  Stretch="Uniform"
+                                                  Width="14" Height="14" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Empty state -->
+                <StackPanel Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="0,30"
+                            Visibility="{Binding IsRecentEmpty, Converter={StaticResource BoolToVisibility}}">
+                    <Border Background="{StaticResource TealSoftBrush}"
+                            Width="64" Height="64"
+                            CornerRadius="32"
+                            HorizontalAlignment="Center">
+                        <Path Data="{StaticResource IconReports}"
+                              Stroke="{StaticResource TealPressedBrush}"
+                              StrokeThickness="1.7"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="28" Height="28" />
+                    </Border>
+                    <TextBlock Text="لم يتم توليد أي تقرير بعد"
+                               Style="{StaticResource SubheadTextStyle}"
+                               HorizontalAlignment="Center"
+                               Margin="0,12,0,0" />
+                    <TextBlock Text="اضغط على إحدى البطاقات لإنشاء تقرير جديد."
+                               Style="{StaticResource CaptionTextStyle}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               Margin="0,4,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

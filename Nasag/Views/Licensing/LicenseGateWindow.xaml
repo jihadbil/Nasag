@@ -1,0 +1,163 @@
+<Window x:Class="Nasag.Views.Licensing.LicenseGateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:Nasag.ViewModels.Licensing"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:LicenseGateViewModel}"
+        Title="الترخيص مطلوب"
+        Width="640"
+        Height="480"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="True"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FlowDirection="RightToLeft">
+
+    <Border CornerRadius="14"
+            Background="{StaticResource CardSurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            Margin="16">
+        <Border.Effect>
+            <DropShadowEffect Color="#1B3A57" BlurRadius="36" ShadowDepth="0" Opacity="0.22" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header (drag region) -->
+            <Border Grid.Row="0"
+                    x:Name="HeaderBar"
+                    Padding="22,18"
+                    Background="Transparent"
+                    MouseLeftButtonDown="OnHeaderDrag">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="48" Height="48"
+                            CornerRadius="24"
+                            VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding StatusKind}" Value="Danger">
+                                        <Setter Property="Background" Value="{StaticResource DangerSoftBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding StatusKind}" Value="Info">
+                                        <Setter Property="Background" Value="{StaticResource InfoSoftBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Path Data="{StaticResource IconShield}"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="22" Height="22">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Stroke" Value="{StaticResource WarningBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StatusKind}" Value="Danger">
+                                            <Setter Property="Stroke" Value="{StaticResource DangerBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding StatusKind}" Value="Info">
+                                            <Setter Property="Stroke" Value="{StaticResource InfoBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Title}"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="{StaticResource FontSizeLg}"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="{Binding Subtitle}"
+                                   Style="{StaticResource MutedTextStyle}"
+                                   FontSize="{StaticResource FontSizeSm}"
+                                   Margin="0,2,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Body -->
+            <Border Grid.Row="1" Padding="28,8,28,12">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Heading}"
+                               FontFamily="{StaticResource TajawalFont}"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,0,0,12" />
+
+                    <TextBlock Text="{Binding Explanation}"
+                               Style="{StaticResource BodyTextStyle}"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               LineHeight="24" />
+
+                    <Border Background="{StaticResource InfoSoftBrush}"
+                            CornerRadius="10"
+                            Padding="14,10"
+                            Margin="0,18,0,0">
+                        <TextBlock Foreground="{StaticResource InfoBrush}"
+                                   TextWrapping="Wrap"
+                                   Text="يمكنك الحصول على ملف الترخيص من المورِّد. اضغط «تفعيل البرنامج» لإدخاله أو لصق محتواه." />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <Border Grid.Row="2"
+                    Background="{StaticResource BackgroundBrush}"
+                    CornerRadius="0,0,14,14"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="22,14">
+                <Grid FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Style="{StaticResource GhostButton}"
+                            Command="{Binding ExitCommand}"
+                            Padding="18,8"
+                            Content="إغلاق البرنامج" />
+
+                    <Button Grid.Column="2"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding OpenActivationCommand}"
+                            Padding="22,8"
+                            IsDefault="True">
+                        <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                            <Path Data="{StaticResource IconKey}"
+                                  Stroke="White"
+                                  StrokeThickness="2"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="14" Height="14"
+                                  VerticalAlignment="Center" />
+                            <TextBlock Text="تفعيل البرنامج"
+                                       Margin="8,0,0,0"
+                                       VerticalAlignment="Center"
+                                       FontWeight="Medium" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

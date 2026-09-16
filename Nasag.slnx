@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Nasag/Nasag.csproj" />
+  <Project Path="Nasag.Licensing/Nasag.Licensing.csproj" />
+  <Project Path="NasaqVendor/NasaqVendor.csproj" />
+  <Project Path="NasaqPackager/NasaqPackager.csproj" />
+</Solution>

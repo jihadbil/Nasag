@@ -1,0 +1,138 @@
+<UserControl x:Class="NasaqVendor.Views.Pages.KeySettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="RightToLeft">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="إعدادات المفتاح" Style="{StaticResource SectionTitle}" />
+                <TextBlock Style="{StaticResource SectionSubtitle}" Text="إدارة المفتاح الخاص لتوقيع تراخيص نَسَق." />
+            </StackPanel>
+
+            <!-- Public key card -->
+            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SubheadTextStyle}" Text="المفتاح العام" Margin="0,0,0,4" />
+                    <TextBlock Style="{StaticResource MutedTextStyle}" Margin="0,0,0,12"
+                               Text="يجب وضع هذا المفتاح في Nasag/Resources/issuer.public.key وتضمينه كـ EmbeddedResource داخل مشروع Nasag.Licensing." />
+
+                    <StackPanel Visibility="{Binding HasKey, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="Base64" Style="{StaticResource FieldLabel}" />
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding PublicKeyBase64, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     TextWrapping="Wrap"
+                                     MinHeight="64"
+                                     MaxHeight="120"
+                                     VerticalScrollBarVisibility="Auto"
+                                     FontFamily="Consolas, Courier New, monospace"
+                                     FontSize="{StaticResource FontSizeSm}" />
+                            <Button Grid.Column="1"
+                                    Command="{Binding CopyPublicKeyCommand}"
+                                    Style="{StaticResource IconButton}"
+                                    ToolTip="نسخ"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Top">
+                                <Path Data="{StaticResource IconCopy}"
+                                      Stroke="{StaticResource TealPressedBrush}"
+                                      StrokeThickness="1.6"
+                                      Fill="Transparent"
+                                      Width="18" Height="18"
+                                      Stretch="Uniform" />
+                            </Button>
+                        </Grid>
+
+                        <TextBlock Text="بصمة SHA-256" Style="{StaticResource FieldLabel}" />
+                        <TextBox Text="{Binding PublicKeyFingerprint, Mode=OneWay}"
+                                 IsReadOnly="True"
+                                 TextWrapping="Wrap"
+                                 FontFamily="Consolas, Courier New, monospace"
+                                 FontSize="{StaticResource FontSizeSm}"
+                                 Margin="0,0,0,16" />
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button Command="{Binding SavePublicKeyCommand}"
+                                    Style="{StaticResource PrimaryButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconExport}"
+                                          Stroke="White"
+                                          StrokeThickness="1.6"
+                                          Fill="Transparent"
+                                          Width="16" Height="16"
+                                          Stretch="Uniform"
+                                          VerticalAlignment="Center" />
+                                    <TextBlock Text="حفظ كملف" Margin="8,0,0,0" Foreground="White" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Border Visibility="{Binding HasKey, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}"
+                            Background="{StaticResource WarningSoftBrush}"
+                            CornerRadius="8"
+                            Padding="14,10">
+                        <TextBlock Text="لا يوجد مفتاح محمَّل. أنشئ زوج مفاتيح جديداً أو استورد مفتاحاً موجوداً من الأسفل."
+                                   Foreground="{StaticResource WarningBrush}"
+                                   TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Key management card -->
+            <Border Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SubheadTextStyle}" Text="إدارة المفاتيح" Margin="0,0,0,4" />
+                    <TextBlock Style="{StaticResource MutedTextStyle}" Margin="0,0,0,16"
+                               Text="عمليات حساسة — توليد مفاتيح جديدة يجعل التراخيص السابقة غير قابلة للتحقق." />
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Command="{Binding GenerateNewKeyPairCommand}"
+                                Style="{StaticResource DangerButton}">
+                            <TextBlock Text="توليد مفاتيح جديدة" Foreground="White" />
+                        </Button>
+                        <Button Command="{Binding ImportPrivateKeyCommand}"
+                                Style="{StaticResource SecondaryButton}"
+                                Margin="10,0,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource IconImport}"
+                                      Stroke="{StaticResource TextPrimaryBrush}"
+                                      StrokeThickness="1.6"
+                                      Fill="Transparent"
+                                      Width="16" Height="16"
+                                      Stretch="Uniform"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="استيراد مفتاح خاص" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Locations card -->
+            <Border Grid.Row="3" Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SubheadTextStyle}" Text="مواقع التخزين" Margin="0,0,0,12" />
+                    <TextBlock Style="{StaticResource MutedTextStyle}" Text="ملف المفتاح الخاص المُشفَّر:" Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding PrivateKeyFilePath}"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontFamily="Consolas, Courier New, monospace"
+                               FontSize="{StaticResource FontSizeSm}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

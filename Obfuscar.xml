@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Obfuscator>
+  <Var name="InPath" value=".\publish\nasaq" />
+  <Var name="OutPath" value=".\publish\nasaq-obf" />
+  <Var name="KeepPublicApi" value="false" />
+  <Var name="HidePrivateApi" value="true" />
+  <Var name="HideStrings" value="true" />
+  <Var name="RenameProperties" value="true" />
+  <Var name="RenameEvents" value="true" />
+  <Var name="RegenerateDebugInfo" value="false" />
+  <Var name="UseUnicodeNames" value="true" />
+  <Var name="AnalyzeXaml" value="true" />
+
+  <AssemblySearchPath path=".\publish\nasaq" />
+  <Module file="$(InPath)\Nasag.dll">
+    <SkipType name="Nasag.App" skipMethods="true" />
+    <SkipType name="Nasag.ViewModels.*" skipProperties="true" skipEvents="true" />
+    <SkipType name="Nasag.Models.*" skipProperties="true" skipFields="true" />
+    <SkipType name="Nasag.Data.*" skipProperties="true" skipFields="true" />
+    <SkipType name="Nasag.Views.*" skipMethods="true" skipEvents="true" />
+    <SkipType name="Nasag.Controls.*" skipMethods="true" skipEvents="true" />
+    <SkipType name="Nasag.Helpers.*" />
+    <SkipType name="Nasag.Converters.*" />
+  </Module>
+  <Module file="$(InPath)\Nasag.Licensing.dll">
+    <!-- Internal classes hidden, but public surface kept since main app calls into it -->
+    <SkipType name="Nasag.Licensing.Fingerprint.*" skipMethods="true" />
+    <SkipType name="Nasag.Licensing.Cryptography.*" skipMethods="true" />
+    <SkipType name="Nasag.Licensing.License.*" skipProperties="true" skipMethods="true" />
+    <SkipType name="Nasag.Licensing.LicenseStatus*" skipProperties="true" />
+  </Module>
+</Obfuscator>

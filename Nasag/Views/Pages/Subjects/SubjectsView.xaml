@@ -1,0 +1,361 @@
+<UserControl x:Class="Nasag.Views.Pages.Subjects.SubjectsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:Nasag.Controls"
+             xmlns:vm="clr-namespace:Nasag.ViewModels.Pages.Subjects"
+             xmlns:helpers="clr-namespace:Nasag.Helpers"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:SubjectsViewModel}"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+    </UserControl.Resources>
+
+    <UserControl.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding ReloadCommand}" />
+        <KeyBinding Modifiers="Control" Key="N" Command="{Binding AddSubjectCommand}" />
+    </UserControl.InputBindings>
+
+    <Grid Margin="22,18,22,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--
+            ===== Page Header =====
+            FlowDirection swap: column 0 is the visual left (refresh button),
+            column 2 the visual right (title).
+        -->
+        <Grid Grid.Row="0" Margin="0,0,0,14" FlowDirection="LeftToRight">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Style="{StaticResource SecondaryButton}"
+                    Command="{Binding ReloadCommand}"
+                    VerticalAlignment="Center"
+                    Padding="14,8"
+                    ToolTip="تحديث البيانات (F5)">
+                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                    <Path Data="{StaticResource IconRefresh}"
+                          Stroke="{StaticResource TextPrimaryBrush}"
+                          StrokeThickness="1.6"
+                          Fill="Transparent"
+                          Stretch="Uniform"
+                          Width="14" Height="14"
+                          VerticalAlignment="Center" />
+                    <TextBlock Text="تحديث"
+                               Margin="6,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <StackPanel Grid.Column="2"
+                        FlowDirection="RightToLeft"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                <TextBlock Text="{Binding TitleAr}"
+                           Style="{StaticResource SectionTitle}"
+                           TextAlignment="Right"
+                           HorizontalAlignment="Right" />
+                <TextBlock Text="{Binding SubtitleAr}"
+                           Style="{StaticResource SectionSubtitle}"
+                           TextAlignment="Right"
+                           HorizontalAlignment="Right"
+                           Margin="0,2,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <!-- ===== Toolbar ===== -->
+        <Border Grid.Row="1"
+                Style="{StaticResource CardBorder}"
+                Padding="14,10"
+                Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="240" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Grade filter (visual right) -->
+                <controls:SearchableComboBox Grid.Column="0"
+                                             ItemsSource="{Binding Grades}"
+                                             SelectedItem="{Binding SelectedGrade, Mode=TwoWay}"
+                                             DisplayMemberPath="NameAr"
+                                             Placeholder="الصف" />
+
+                <!-- Search box -->
+                <Border Grid.Column="1"
+                        Background="{StaticResource BackgroundBrush}"
+                        CornerRadius="{StaticResource RadiusSm}"
+                        Padding="10,2"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Path Grid.Column="0"
+                              Data="{StaticResource IconSearch}"
+                              Stroke="{StaticResource TextMutedBrush}"
+                              StrokeThickness="1.6"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="16" Height="16"
+                              VerticalAlignment="Center" />
+                        <Grid Grid.Column="1" Margin="8,0,0,0">
+                            <TextBlock x:Name="SearchPlaceholder"
+                                       Text="ابحث عن مادة…"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       Margin="3,0,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SearchText}" Value="">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SearchText}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     MinHeight="30"
+                                     VerticalContentAlignment="Center"
+                                     ToolTip="بحث باسم المادة" />
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Refresh small -->
+                <Button Grid.Column="2"
+                        Style="{StaticResource SecondaryButton}"
+                        Command="{Binding ReloadCommand}"
+                        Margin="8,0,0,0"
+                        Padding="10,6"
+                        ToolTip="تحديث البيانات (F5)">
+                    <Path Data="{StaticResource IconRefresh}"
+                          Stroke="{StaticResource TextPrimaryBrush}"
+                          StrokeThickness="1.6"
+                          Fill="Transparent"
+                          Stretch="Uniform"
+                          Width="14" Height="14" />
+                </Button>
+
+                <!-- Clear filters -->
+                <Button Grid.Column="3"
+                        Style="{StaticResource SecondaryButton}"
+                        Command="{Binding ClearFiltersCommand}"
+                        Margin="6,0,0,0"
+                        Padding="10,6"
+                        ToolTip="مسح كل الفلاتر">
+                    <Path Data="{StaticResource IconFilterClear}"
+                          Stroke="{StaticResource TextSecondaryBrush}"
+                          StrokeThickness="1.6"
+                          Fill="Transparent"
+                          Stretch="Uniform"
+                          Width="14" Height="14" />
+                </Button>
+
+                <!-- Add bubble button (visual far left) -->
+                <Button Grid.Column="4"
+                        Style="{StaticResource BubbleButton}"
+                        Command="{Binding AddSubjectCommand}"
+                        Margin="8,0,0,0"
+                        Padding="16,8"
+                        ToolTip="إضافة مادة (Ctrl+N)">
+                    <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                        <Path Data="{StaticResource IconAdd}"
+                              Stroke="White"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="14" Height="14"
+                              VerticalAlignment="Center" />
+                        <TextBlock Text="إضافة مادة"
+                                   Foreground="White"
+                                   FontWeight="Medium"
+                                   Margin="6,0,0,0"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- ===== Data grid card ===== -->
+        <Border Grid.Row="2"
+                Style="{StaticResource CardBorder}"
+                Padding="0">
+            <Grid>
+                <DataGrid x:Name="SubjectsGrid"
+                          ItemsSource="{Binding Items}"
+                          SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          HeadersVisibility="Column"
+                          IsReadOnly="True"
+                          EnableRowVirtualization="True"
+                          MouseDoubleClick="OnGridDoubleClick"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="المادة"
+                                            Binding="{Binding NameAr}"
+                                            Width="2*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Margin" Value="10,0,10,0" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="الصف"
+                                            Binding="{Binding GradeName}"
+                                            Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="10,0,10,0" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="الدرجة الكاملة"
+                                            Binding="{Binding MaxMark}"
+                                            Width="130">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="FontWeight" Value="Medium" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="درجة النجاح"
+                                            Binding="{Binding PassMark}"
+                                            Width="130">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="عدد الدرجات"
+                                            Binding="{Binding MarksCount}"
+                                            Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTemplateColumn Header="إجراءات" Width="120" CanUserSort="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                Margin="6,2">
+                                        <Button Style="{StaticResource RowActionButton}"
+                                                ToolTip="تعديل المادة"
+                                                Command="{Binding DataContext.EditSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Path Data="{StaticResource IconEdit}"
+                                                  Stroke="{StaticResource TextSecondaryBrush}"
+                                                  StrokeThickness="1.6"
+                                                  Fill="Transparent"
+                                                  Stretch="Uniform" />
+                                        </Button>
+                                        <Button Style="{StaticResource RowActionButton}"
+                                                Margin="6,0,0,0"
+                                                ToolTip="حذف المادة"
+                                                Command="{Binding DataContext.DeleteSubjectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Path Data="{StaticResource IconDelete}"
+                                                  Stroke="{StaticResource DangerBrush}"
+                                                  StrokeThickness="1.6"
+                                                  Fill="Transparent"
+                                                  Stretch="Uniform" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Empty state overlay (only when not loading and no rows) -->
+                <Border Background="{StaticResource OverlayBrush}"
+                        IsHitTestVisible="False">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Items.Count}" Value="0" />
+                                        <Condition Binding="{Binding IsLoading}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Background="{StaticResource TealSoftBrush}"
+                                Width="52" Height="52"
+                                CornerRadius="26"
+                                HorizontalAlignment="Center">
+                            <Path Data="{StaticResource IconSubjects}"
+                                  Stroke="{StaticResource TealPressedBrush}"
+                                  StrokeThickness="1.7"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="22" Height="22" />
+                        </Border>
+                        <TextBlock Text="لا توجد مواد مطابقة"
+                                   Style="{StaticResource SubheadTextStyle}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,10,0,0" />
+                        <TextBlock Text="استخدم زر «إضافة مادة» أو امسح الفلاتر"
+                                   Style="{StaticResource CaptionTextStyle}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <controls:LoadingOverlay Grid.RowSpan="3"
+                                 IsBusy="{Binding IsLoading}"
+                                 Message="جاري تحميل المواد…" />
+    </Grid>
+</UserControl>

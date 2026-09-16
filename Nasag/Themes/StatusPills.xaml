@@ -1,0 +1,53 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Base pill — apply one of the color-keyed styles below -->
+    <Style x:Key="PillBase" TargetType="Border">
+        <Setter Property="CornerRadius" Value="999" />
+        <Setter Property="Padding" Value="10,3" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="PillTextBase" TargetType="TextBlock" BasedOn="{StaticResource BodyTextStyle}">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSm}" />
+        <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+
+    <Style x:Key="SuccessPill" TargetType="Border" BasedOn="{StaticResource PillBase}">
+        <Setter Property="Background" Value="{StaticResource SuccessSoftBrush}" />
+    </Style>
+    <Style x:Key="SuccessPillText" TargetType="TextBlock" BasedOn="{StaticResource PillTextBase}">
+        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+    </Style>
+
+    <Style x:Key="WarningPill" TargetType="Border" BasedOn="{StaticResource PillBase}">
+        <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+    </Style>
+    <Style x:Key="WarningPillText" TargetType="TextBlock" BasedOn="{StaticResource PillTextBase}">
+        <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+    </Style>
+
+    <Style x:Key="DangerPill" TargetType="Border" BasedOn="{StaticResource PillBase}">
+        <Setter Property="Background" Value="{StaticResource DangerSoftBrush}" />
+    </Style>
+    <Style x:Key="DangerPillText" TargetType="TextBlock" BasedOn="{StaticResource PillTextBase}">
+        <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+    </Style>
+
+    <Style x:Key="InfoPill" TargetType="Border" BasedOn="{StaticResource PillBase}">
+        <Setter Property="Background" Value="{StaticResource InfoSoftBrush}" />
+    </Style>
+    <Style x:Key="InfoPillText" TargetType="TextBlock" BasedOn="{StaticResource PillTextBase}">
+        <Setter Property="Foreground" Value="{StaticResource InfoBrush}" />
+    </Style>
+
+    <Style x:Key="TealPill" TargetType="Border" BasedOn="{StaticResource PillBase}">
+        <Setter Property="Background" Value="{StaticResource TealSoftBrush}" />
+    </Style>
+    <Style x:Key="TealPillText" TargetType="TextBlock" BasedOn="{StaticResource PillTextBase}">
+        <Setter Property="Foreground" Value="{StaticResource TealPressedBrush}" />
+    </Style>
+
+</ResourceDictionary>

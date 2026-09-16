@@ -1,0 +1,16 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="clr-namespace:NasaqVendor.Helpers">
+
+    <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <helpers:InverseBoolConverter x:Key="InverseBool" />
+    <helpers:NullToVisibilityConverter x:Key="NullToVisibility" />
+    <helpers:DateToStringConverter x:Key="DateToString" />
+    <helpers:DateOnlyToStringConverter x:Key="DateOnlyToString" />
+    <helpers:EditionToArabicConverter x:Key="EditionToArabic" />
+    <helpers:TruncatePathConverter x:Key="TruncatePath" />
+    <helpers:ActivePageConverter x:Key="ActivePageConverter" />
+    <helpers:IntToBoolConverter x:Key="IntToBool" />
+
+</ResourceDictionary>

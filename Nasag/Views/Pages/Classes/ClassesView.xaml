@@ -1,0 +1,613 @@
+<UserControl x:Class="Nasag.Views.Pages.Classes.ClassesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:Nasag.Controls"
+             xmlns:vm="clr-namespace:Nasag.ViewModels.Pages.Classes"
+             xmlns:helpers="clr-namespace:Nasag.Helpers"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ClassesViewModel}"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+        <helpers:StudentStatusToArabicConverter x:Key="StatusToText" />
+        <helpers:StudentStatusToBackgroundConverter x:Key="StatusBg" />
+        <helpers:StudentStatusToForegroundConverter x:Key="StatusFg" />
+        <helpers:InitialLetterConverter x:Key="InitialLetter" />
+    </UserControl.Resources>
+
+    <!-- Page shortcuts -->
+    <UserControl.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding ReloadCommand}" />
+        <KeyBinding Modifiers="Control" Key="N" Command="{Binding AddSectionCommand}" />
+    </UserControl.InputBindings>
+
+    <Grid Margin="22,18,22,18">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--
+                ===== Page Header =====
+                FlowDirection swap so Column 2 is the actual visual right edge.
+            -->
+            <Grid Grid.Row="0" Margin="0,0,0,14" FlowDirection="LeftToRight">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Refresh (visual left under RTL = column 0) -->
+                <Button Grid.Column="0"
+                        Style="{StaticResource SecondaryButton}"
+                        Command="{Binding ReloadCommand}"
+                        VerticalAlignment="Center"
+                        Padding="14,8"
+                        ToolTip="تحديث البيانات (F5)">
+                    <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                        <Path Data="{StaticResource IconRefresh}"
+                              Stroke="{StaticResource TextPrimaryBrush}"
+                              StrokeThickness="1.6"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="14" Height="14"
+                              VerticalAlignment="Center" />
+                        <TextBlock Text="تحديث"
+                                   Margin="6,0,0,0"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Title pinned visually right -->
+                <StackPanel Grid.Column="2"
+                            FlowDirection="RightToLeft"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="{Binding TitleAr}"
+                               Style="{StaticResource SectionTitle}"
+                               TextAlignment="Right"
+                               HorizontalAlignment="Right" />
+                    <TextBlock Text="{Binding SubtitleAr}"
+                               Style="{StaticResource SectionSubtitle}"
+                               TextAlignment="Right"
+                               HorizontalAlignment="Right"
+                               Margin="0,2,0,0" />
+                </StackPanel>
+            </Grid>
+
+            <!--
+                ===== Body =====
+                RTL layout — column 0 is the visual right (grades list, fixed
+                width). Column 2 is the visual left (stacked sections card +
+                students card). A 12px gutter keeps the cards from touching.
+            -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- ===== Grades panel (right) ===== -->
+                <Border Grid.Column="0"
+                        Style="{StaticResource CardBorder}"
+                        Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="0,0,0,1"
+                                Padding="14,12">
+                            <StackPanel>
+                                <TextBlock Text="الصفوف"
+                                           FontWeight="Bold"
+                                           Style="{StaticResource SubheadTextStyle}" />
+                                <TextBlock Style="{StaticResource MutedTextStyle}"
+                                           FontSize="{StaticResource FontSizeSm}"
+                                           Margin="0,2,0,0">
+                                    <Run Text="{Binding Stats.GradeCount, Mode=OneWay}" />
+                                    <Run Text=" صف مُعرَّف" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <ListBox Grid.Row="1"
+                                 x:Name="GradesList"
+                                 ItemsSource="{Binding Grades}"
+                                 SelectedItem="{Binding SelectedGrade, Mode=TwoWay}"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 HorizontalContentAlignment="Stretch">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="Root"
+                                                        Background="Transparent"
+                                                        BorderBrush="{StaticResource BorderBrush}"
+                                                        BorderThickness="0,0,0,1"
+                                                        Padding="0">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="3" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <!-- Selected accent strip on the right edge (column 0 under RTL) -->
+                                                        <Border x:Name="Accent"
+                                                                Grid.Column="0"
+                                                                Background="Transparent" />
+                                                        <ContentPresenter Grid.Column="1" Margin="14,10" />
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Root" Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="Root" Property="Background" Value="{StaticResource TealSoftBrush}" />
+                                                        <Setter TargetName="Accent" Property="Background" Value="{StaticResource TealPrimaryBrush}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding NameAr}"
+                                                       FontWeight="Medium"
+                                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                <!-- Sections badge -->
+                                                <Border CornerRadius="{StaticResource RadiusSm}"
+                                                        Background="{StaticResource TealSoftBrush}"
+                                                        Padding="6,1">
+                                                    <TextBlock Foreground="{StaticResource TealPressedBrush}"
+                                                               FontSize="{StaticResource FontSizeXs}"
+                                                               FontWeight="Medium">
+                                                        <Run Text="{Binding SectionCount, Mode=OneWay}" />
+                                                        <Run Text=" شعبة" />
+                                                    </TextBlock>
+                                                </Border>
+                                                <!-- Students badge -->
+                                                <Border CornerRadius="{StaticResource RadiusSm}"
+                                                        Background="{StaticResource BackgroundBrush}"
+                                                        BorderBrush="{StaticResource BorderBrush}"
+                                                        BorderThickness="1"
+                                                        Margin="6,0,0,0"
+                                                        Padding="6,1">
+                                                    <TextBlock Foreground="{StaticResource TextSecondaryBrush}"
+                                                               FontSize="{StaticResource FontSizeXs}">
+                                                        <Run Text="{Binding StudentCount, Mode=OneWay}" />
+                                                        <Run Text=" طالب" />
+                                                    </TextBlock>
+                                                </Border>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Style="{StaticResource RowActionButton}"
+                                                    ToolTip="تعديل الصف"
+                                                    Command="{Binding DataContext.EditGradeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <Path Data="{StaticResource IconEdit}"
+                                                      Stroke="{StaticResource TextSecondaryBrush}"
+                                                      StrokeThickness="1.6"
+                                                      Fill="Transparent"
+                                                      Stretch="Uniform" />
+                                            </Button>
+                                            <Button Style="{StaticResource RowActionButton}"
+                                                    Margin="4,0,0,0"
+                                                    ToolTip="حذف الصف"
+                                                    Command="{Binding DataContext.DeleteGradeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <Path Data="{StaticResource IconDelete}"
+                                                      Stroke="{StaticResource DangerBrush}"
+                                                      StrokeThickness="1.6"
+                                                      Fill="Transparent"
+                                                      Stretch="Uniform" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- Empty state -->
+                        <StackPanel Grid.Row="1"
+                                    Visibility="{Binding HasGrades, Converter={StaticResource InverseBoolToVisibility}}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Margin="20">
+                            <Border Background="{StaticResource TealSoftBrush}"
+                                    Width="48" Height="48"
+                                    CornerRadius="24"
+                                    HorizontalAlignment="Center">
+                                <Path Data="{StaticResource IconClasses}"
+                                      Stroke="{StaticResource TealPressedBrush}"
+                                      StrokeThickness="1.7"
+                                      Fill="Transparent"
+                                      Stretch="Uniform"
+                                      Width="22" Height="22" />
+                            </Border>
+                            <TextBlock Text="لا توجد صفوف بعد"
+                                       Style="{StaticResource SubheadTextStyle}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,10,0,0" />
+                            <TextBlock Text="ابدأ بإضافة أول صف"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <!-- Add grade button (footer) -->
+                        <Border Grid.Row="2"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="0,1,0,0"
+                                Padding="14,12">
+                            <Button Style="{StaticResource BubbleButton}"
+                                    Command="{Binding AddGradeCommand}"
+                                    HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource IconAdd}"
+                                          Stroke="White"
+                                          StrokeThickness="2"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Width="14" Height="14"
+                                          VerticalAlignment="Center" />
+                                    <TextBlock Text="إضافة صف"
+                                               Foreground="White"
+                                               FontWeight="Medium"
+                                               Margin="8,0,0,0"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- ===== Sections + Students panel (left, stacked) ===== -->
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="12" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- ===== Sections card ===== -->
+                    <Border Grid.Row="0"
+                            Style="{StaticResource CardBorder}"
+                            Padding="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="14,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding SectionsTitle}"
+                                                   FontWeight="Bold"
+                                                   Style="{StaticResource SubheadTextStyle}" />
+                                        <TextBlock Style="{StaticResource MutedTextStyle}"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   Margin="0,2,0,0"
+                                                   Visibility="{Binding HasSelectedGrade, Converter={StaticResource BoolToVisibility}}">
+                                            <Run Text="{Binding Sections.Count, Mode=OneWay}" />
+                                            <Run Text=" شعبة في السنة الحالية" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource BubbleButton}"
+                                            Command="{Binding AddSectionCommand}"
+                                            ToolTip="إضافة شعبة للصف المختار (Ctrl+N)">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="{StaticResource IconAdd}"
+                                                  Stroke="White"
+                                                  StrokeThickness="2"
+                                                  Fill="Transparent"
+                                                  Stretch="Uniform"
+                                                  Width="14" Height="14"
+                                                  VerticalAlignment="Center" />
+                                            <TextBlock Text="إضافة شعبة"
+                                                       Foreground="White"
+                                                       FontWeight="Medium"
+                                                       Margin="6,0,0,0"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </Border>
+
+                            <DataGrid Grid.Row="1"
+                                      ItemsSource="{Binding Sections}"
+                                      SelectedItem="{Binding SelectedSection, Mode=TwoWay}"
+                                      Visibility="{Binding HasSections, Converter={StaticResource BoolToVisibility}}"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="الشعبة" Binding="{Binding NameAr}" Width="*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="FontWeight" Value="Medium" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="الإشغال" Width="180" CanUserSort="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel HorizontalAlignment="Center" Margin="10,6">
+                                                    <TextBlock HorizontalAlignment="Center"
+                                                               FontSize="{StaticResource FontSizeSm}"
+                                                               Foreground="{StaticResource TextSecondaryBrush}">
+                                                        <Run Text="{Binding StudentCount, Mode=OneWay}" />
+                                                        <Run Text=" / " />
+                                                        <Run Text="{Binding Capacity, Mode=OneWay}" />
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="المتبقي"
+                                                        Binding="{Binding Remaining}"
+                                                        Width="100">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                <Setter Property="FontWeight" Value="Medium" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsOverCapacity}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                                        <Setter Property="FontWeight" Value="Bold" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="إجراءات" Width="140" CanUserSort="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="6,2">
+                                                    <Button Style="{StaticResource RowActionButton}"
+                                                            ToolTip="تعديل الشعبة"
+                                                            Command="{Binding DataContext.EditSectionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}">
+                                                        <Path Data="{StaticResource IconEdit}"
+                                                              Stroke="{StaticResource TextSecondaryBrush}"
+                                                              StrokeThickness="1.6"
+                                                              Fill="Transparent"
+                                                              Stretch="Uniform" />
+                                                    </Button>
+                                                    <Button Style="{StaticResource RowActionButton}"
+                                                            Margin="6,0,0,0"
+                                                            ToolTip="حذف الشعبة"
+                                                            Command="{Binding DataContext.DeleteSectionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}">
+                                                        <Path Data="{StaticResource IconDelete}"
+                                                              Stroke="{StaticResource DangerBrush}"
+                                                              StrokeThickness="1.6"
+                                                              Fill="Transparent"
+                                                              Stretch="Uniform" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <StackPanel Grid.Row="1"
+                                        Visibility="{Binding HasSections, Converter={StaticResource InverseBoolToVisibility}}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Margin="20">
+                                <Border Background="{StaticResource TealSoftBrush}"
+                                        Width="52" Height="52"
+                                        CornerRadius="26"
+                                        HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource IconClasses}"
+                                          Stroke="{StaticResource TealPressedBrush}"
+                                          StrokeThickness="1.7"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Width="22" Height="22" />
+                                </Border>
+                                <TextBlock Style="{StaticResource SubheadTextStyle}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,10,0,0">
+                                    <Run Text="لا توجد شعب " />
+                                    <Run Text="{Binding SelectedGrade.NameAr, Mode=OneWay, FallbackValue=''}" />
+                                </TextBlock>
+                                <TextBlock Style="{StaticResource CaptionTextStyle}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,4,0,0"
+                                           Text="استخدم زر «إضافة شعبة» في الأعلى" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- ===== Students-in-section card ===== -->
+                    <Border Grid.Row="2"
+                            Style="{StaticResource CardBorder}"
+                            Padding="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="14,12">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding StudentsTitle}"
+                                               FontWeight="Bold"
+                                               Style="{StaticResource SubheadTextStyle}" />
+                                    <TextBlock Style="{StaticResource MutedTextStyle}"
+                                               FontSize="{StaticResource FontSizeSm}"
+                                               Margin="0,2,0,0"
+                                               Visibility="{Binding HasSelectedSection, Converter={StaticResource BoolToVisibility}}">
+                                        <Run Text="{Binding StudentsInSection.Count, Mode=OneWay}" />
+                                        <Run Text=" طالب — يمكن نقلهم لشعبة أخرى من زر السهم" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <DataGrid Grid.Row="1"
+                                      ItemsSource="{Binding StudentsInSection}"
+                                      Visibility="{Binding HasStudentsInSection, Converter={StaticResource BoolToVisibility}}"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="رقم الطالب"
+                                                        Binding="{Binding StudentNumber}"
+                                                        Width="120">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                                <Setter Property="FontWeight" Value="Medium" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="الاسم" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Center"
+                                                            Margin="6,4">
+                                                    <Border Width="28" Height="28"
+                                                            CornerRadius="14"
+                                                            Background="{StaticResource TealSoftBrush}">
+                                                        <TextBlock Text="{Binding FullName, Converter={StaticResource InitialLetter}}"
+                                                                   Foreground="{StaticResource TealPressedBrush}"
+                                                                   FontWeight="Bold"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <TextBlock Text="{Binding FullName}"
+                                                               Margin="10,0,0,0"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="الحالة" Width="110">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="999"
+                                                        Padding="10,3"
+                                                        Margin="6,4"
+                                                        HorizontalAlignment="Center"
+                                                        Background="{Binding Status, Converter={StaticResource StatusBg}}">
+                                                    <TextBlock Text="{Binding Status, Converter={StaticResource StatusToText}}"
+                                                               Foreground="{Binding Status, Converter={StaticResource StatusFg}}"
+                                                               FontSize="{StaticResource FontSizeSm}"
+                                                               FontWeight="Medium" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="الجوال"
+                                                        Binding="{Binding Phone}"
+                                                        Width="150">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="إجراءات" Width="130" CanUserSort="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource RowActionButton}"
+                                                        HorizontalAlignment="Center"
+                                                        Margin="6,2"
+                                                        ToolTip="نقل الطالب إلى شعبة أخرى"
+                                                        Command="{Binding DataContext.MoveStudentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}">
+                                                    <Path Data="M3 12 H21 M15 6 L21 12 L15 18"
+                                                          Stroke="{StaticResource InfoBrush}"
+                                                          StrokeThickness="1.6"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round"
+                                                          StrokeLineJoin="Round"
+                                                          Fill="Transparent"
+                                                          Stretch="Uniform" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <StackPanel Grid.Row="1"
+                                        Visibility="{Binding HasStudentsInSection, Converter={StaticResource InverseBoolToVisibility}}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Margin="20">
+                                <Border Background="{StaticResource BackgroundBrush}"
+                                        Width="48" Height="48"
+                                        CornerRadius="24"
+                                        HorizontalAlignment="Center">
+                                    <Path Data="{StaticResource IconStudents}"
+                                          Stroke="{StaticResource TextMutedBrush}"
+                                          StrokeThickness="1.6"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Width="22" Height="22" />
+                                </Border>
+                                <TextBlock Style="{StaticResource MutedTextStyle}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,10,0,0"
+                                           Text="لا يوجد طلاب في هذه الشعبة" />
+                                <TextBlock Style="{StaticResource CaptionTextStyle}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,4,0,0"
+                                           Text="أضف الطلاب من شاشة «الطلاب» أو انقل طلاباً من شعبة أخرى" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <controls:LoadingOverlay IsBusy="{Binding IsLoading}" Message="جاري تحميل الصفوف والشعب…" />
+    </Grid>
+</UserControl>

@@ -1,0 +1,475 @@
+<UserControl x:Class="Nasag.Views.Pages.Students.StudentEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:Nasag.ViewModels.Pages.Students"
+             xmlns:helpers="clr-namespace:Nasag.Helpers"
+             xmlns:controls="clr-namespace:Nasag.Controls"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:StudentEditorViewModel}"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+        <helpers:InverseBoolConverter x:Key="InverseBool" />
+        <helpers:BytesToImageSourceConverter x:Key="BytesToImage" />
+        <helpers:StringNotEmptyToBoolConverter x:Key="StringNotEmpty" />
+    </UserControl.Resources>
+
+    <!-- Editor-scoped shortcuts: Ctrl+S saves, Esc cancels. -->
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Control" Key="S" Command="{Binding SaveCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CancelCommand}" />
+    </UserControl.InputBindings>
+
+    <Grid>
+        <Grid Margin="20,16,20,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- ===== Fixed action bar (top) ===== -->
+            <Border Grid.Row="0"
+                    Style="{StaticResource CardBorder}"
+                    Padding="14,10"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title (visual right under RTL) -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="32" Height="32" CornerRadius="16"
+                                Background="{StaticResource TealSoftBrush}"
+                                VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconStudents}"
+                                  Stroke="{StaticResource TealPressedBrush}"
+                                  StrokeThickness="1.7"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="16" Height="16" />
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}"
+                                       FontWeight="Bold"
+                                       Style="{StaticResource SubheadTextStyle}" />
+                            <TextBlock Text="الحقول المطلوبة: الاسم، رقم الطالب، الصف، الشعبة، اسم ولي الأمر."
+                                       Style="{StaticResource MutedTextStyle}"
+                                       FontSize="{StaticResource FontSizeSm}"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Actions (visual left under RTL) -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource GhostButton}"
+                                Command="{Binding CancelCommand}"
+                                Padding="14,8"
+                                Margin="0,0,8,0"
+                                ToolTip="رجوع (Esc)">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource IconChevronLeft}"
+                                      Stroke="{StaticResource TextSecondaryBrush}"
+                                      StrokeThickness="1.6"
+                                      Fill="Transparent"
+                                      Stretch="Uniform"
+                                      Width="12" Height="12"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="رجوع للقائمة"
+                                           Margin="6,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource PrimaryButton}"
+                                Command="{Binding SaveCommand}"
+                                Padding="24,8"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}"
+                                ToolTip="حفظ (Ctrl+S)">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource IconCheck}"
+                                      Stroke="White"
+                                      StrokeThickness="2"
+                                      Fill="Transparent"
+                                      Stretch="Uniform"
+                                      Width="14" Height="14"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="حفظ"
+                                           Margin="8,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ===== Error banner ===== -->
+            <Border Grid.Row="1"
+                    Background="{StaticResource DangerSoftBrush}"
+                    BorderBrush="{StaticResource DangerBrush}"
+                    BorderThickness="0,0,4,0"
+                    CornerRadius="{StaticResource RadiusSm}"
+                    Padding="12,8"
+                    Margin="0,0,0,8">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ErrorMessage, Converter={StaticResource StringNotEmpty}}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="{StaticResource DangerBrush}"
+                           FontWeight="Medium"
+                           TextWrapping="Wrap" />
+            </Border>
+
+            <!-- ===== Form body (scrollable) ===== -->
+            <ScrollViewer Grid.Row="2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="0,0,0,16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="260" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Cards column -->
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+
+                        <!-- Card 1: Student data -->
+                        <Border Style="{StaticResource CardBorder}" Padding="18" Margin="0,0,0,10">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                    <Border Width="26" Height="26" CornerRadius="13"
+                                            Background="{StaticResource TealSoftBrush}">
+                                        <TextBlock Text="1"
+                                                   Foreground="{StaticResource TealPressedBrush}"
+                                                   FontWeight="Bold"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="بيانات الطالب"
+                                               FontWeight="Bold"
+                                               Style="{StaticResource SubheadTextStyle}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0,0,0" />
+                                </StackPanel>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,12">
+                                        <TextBlock Text="الاسم الكامل *" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,12">
+                                        <TextBlock Text="رقم الطالب *" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding StudentNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="4" Margin="0,0,0,12">
+                                        <TextBlock Text="الجنس" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox ItemsSource="{Binding Genders}"
+                                                  SelectedValuePath="Value"
+                                                  DisplayMemberPath="Label"
+                                                  SelectedValue="{Binding Gender}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,12">
+                                        <TextBlock Text="تاريخ الميلاد" Style="{StaticResource FieldLabel}" />
+                                        <DatePicker SelectedDate="{Binding BirthDate}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,12">
+                                        <TextBlock Text="رقم الهوية" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding NationalId, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="4" Margin="0,0,0,12">
+                                        <TextBlock Text="جوال الطالب" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.Column="0">
+                                        <TextBlock Text="الصف *" Style="{StaticResource FieldLabel}" />
+                                        <controls:SearchableComboBox ItemsSource="{Binding Grades}"
+                                                                     DisplayMemberPath="NameAr"
+                                                                     SelectedItem="{Binding SelectedGrade, Mode=TwoWay}"
+                                                                     Placeholder="ابحث عن الصف…" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2">
+                                        <TextBlock Text="الشعبة *" Style="{StaticResource FieldLabel}" />
+                                        <controls:SearchableComboBox ItemsSource="{Binding AvailableSections}"
+                                                                     DisplayMemberPath="NameAr"
+                                                                     SelectedItem="{Binding SelectedSection, Mode=TwoWay}"
+                                                                     Placeholder="ابحث عن الشعبة…" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="4">
+                                        <TextBlock Text="تاريخ التسجيل" Style="{StaticResource FieldLabel}" />
+                                        <DatePicker SelectedDate="{Binding EnrollmentDate}" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 2: Guardian data -->
+                        <Border Style="{StaticResource CardBorder}" Padding="18" Margin="0,0,0,10">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                    <Border Width="26" Height="26" CornerRadius="13"
+                                            Background="{StaticResource InfoSoftBrush}">
+                                        <TextBlock Text="2"
+                                                   Foreground="{StaticResource InfoBrush}"
+                                                   FontWeight="Bold"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="بيانات ولي الأمر"
+                                               FontWeight="Bold"
+                                               Style="{StaticResource SubheadTextStyle}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0,0,0" />
+                                </StackPanel>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,12">
+                                        <TextBlock Text="اسم ولي الأمر *" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding GuardianFullName, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,12">
+                                        <TextBlock Text="صلة القرابة" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox ItemsSource="{Binding GuardianRelations}"
+                                                  SelectedValuePath="Value"
+                                                  DisplayMemberPath="Label"
+                                                  SelectedValue="{Binding GuardianRelation}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="4" Margin="0,0,0,12">
+                                        <TextBlock Text="جوال ولي الأمر" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding GuardianPhone, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,12">
+                                        <TextBlock Text="جوال احتياطي" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding GuardianAltPhone, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,12">
+                                        <TextBlock Text="البريد الإلكتروني" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding GuardianEmail, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="4" Margin="0,0,0,12">
+                                        <TextBlock Text="رقم الهوية" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding GuardianNationalId, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5">
+                                        <TextBlock Text="المهنة" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding GuardianOccupation, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 3: Address & notes -->
+                        <Border Style="{StaticResource CardBorder}" Padding="18">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                    <Border Width="26" Height="26" CornerRadius="13"
+                                            Background="{StaticResource WarningSoftBrush}">
+                                        <TextBlock Text="3"
+                                                   Foreground="{StaticResource WarningBrush}"
+                                                   FontWeight="Bold"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="العنوان والملاحظات"
+                                               FontWeight="Bold"
+                                               Style="{StaticResource SubheadTextStyle}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0,0,0" />
+                                </StackPanel>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,0,12">
+                                        <TextBlock Text="عنوان الطالب" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Margin="0,0,0,12">
+                                        <TextBlock Text="عنوان ولي الأمر" Style="{StaticResource FieldLabel}" />
+                                        <TextBox Text="{Binding GuardianAddress, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel>
+                                    <TextBlock Text="ملاحظات" Style="{StaticResource FieldLabel}" />
+                                    <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                                             AcceptsReturn="True"
+                                             TextWrapping="Wrap"
+                                             MinHeight="64"
+                                             VerticalContentAlignment="Top" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Photo column — entire frame is clickable (dropzone-style) -->
+                    <StackPanel Grid.Column="1">
+                        <Border Style="{StaticResource CardBorder}" Padding="14">
+                            <StackPanel>
+                                <TextBlock Text="صورة الطالب (اختيارية)"
+                                           FontWeight="Bold"
+                                           Style="{StaticResource SubheadTextStyle}"
+                                           Margin="0,0,0,12" />
+
+                                <!--
+                                    Photo dropzone.
+                                    Layered as: Button (dropzone) under, Image overlay above.
+                                    Putting the Image OUTSIDE the Button's ControlTemplate is
+                                    important: bindings on Image.Source are FrameworkElement
+                                    bindings that reliably inherit DataContext from the
+                                    surrounding visual tree and update immediately after a file
+                                    is selected.
+                                -->
+                                <Grid Width="200" Height="200" HorizontalAlignment="Center">
+                                    <Button Command="{Binding PickPhotoCommand}"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Cursor="Hand"
+                                            ToolTip="انقر لاختيار صورة (PNG / JPG / JPEG / BMP / GIF)">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Root"
+                                                        CornerRadius="14"
+                                                        Background="{StaticResource BackgroundBrush}"
+                                                        BorderBrush="{StaticResource BorderStrongBrush}"
+                                                        BorderThickness="2"
+                                                        SnapsToDevicePixels="True">
+                                                    <StackPanel HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center">
+                                                        <Border Background="{StaticResource TealSoftBrush}"
+                                                                Width="56" Height="56"
+                                                                CornerRadius="28"
+                                                                HorizontalAlignment="Center">
+                                                            <Path Data="{StaticResource IconCamera}"
+                                                                  Stroke="{StaticResource TealPressedBrush}"
+                                                                  StrokeThickness="1.8"
+                                                                  Fill="Transparent"
+                                                                  Stretch="Uniform"
+                                                                  Width="26" Height="26" />
+                                                        </Border>
+                                                        <TextBlock Text="اضغط لاختيار صورة"
+                                                                   Style="{StaticResource BodyTextStyle}"
+                                                                   FontWeight="Medium"
+                                                                   HorizontalAlignment="Center"
+                                                                   Margin="0,12,0,2" />
+                                                        <TextBlock Text="PNG · JPG · JPEG · BMP"
+                                                                   Style="{StaticResource CaptionTextStyle}"
+                                                                   HorizontalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource TealPrimaryBrush}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+
+                                    <!--
+                                        Photo overlay. IsHitTestVisible=False so the click
+                                        passes through to the underlying Button (file picker).
+                                    -->
+                                    <Image Source="{Binding PhotoBytes, Converter={StaticResource BytesToImage}}"
+                                           Margin="2"
+                                           Width="196"
+                                           Height="196"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Stretch="UniformToFill"
+                                           IsHitTestVisible="False"
+                                           Visibility="{Binding HasPhoto, Converter={StaticResource BoolToVisibility}}" />
+                                </Grid>
+
+                                <Button Style="{StaticResource SecondaryButton}"
+                                        Command="{Binding PickPhotoCommand}"
+                                        Margin="0,12,0,0"
+                                        HorizontalAlignment="Stretch">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Path Data="{StaticResource IconCamera}"
+                                              Stroke="{StaticResource TextPrimaryBrush}"
+                                              StrokeThickness="1.7"
+                                              Fill="Transparent"
+                                              Stretch="Uniform"
+                                              Width="14" Height="14"
+                                              VerticalAlignment="Center" />
+                                        <TextBlock Text="استبدال الصورة"
+                                                   Margin="8,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Style="{StaticResource GhostButton}"
+                                        Command="{Binding RemovePhotoCommand}"
+                                        Margin="0,6,0,0"
+                                        HorizontalAlignment="Stretch"
+                                        Visibility="{Binding HasPhoto, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="إزالة الصورة"
+                                               Foreground="{StaticResource DangerBrush}"
+                                               FontWeight="Medium" />
+                                </Button>
+
+                                <TextBlock Text="تُحفظ الصورة داخل قاعدة البيانات."
+                                           Style="{StaticResource CaptionTextStyle}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,10,0,0"
+                                           HorizontalAlignment="Center"
+                                           TextAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+        <controls:LoadingOverlay IsBusy="{Binding IsBusy}" Message="جاري حفظ بيانات الطالب…" />
+    </Grid>
+</UserControl>

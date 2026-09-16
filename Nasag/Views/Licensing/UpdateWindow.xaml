@@ -1,0 +1,240 @@
+<Window x:Class="Nasag.Views.Licensing.UpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:helpers="clr-namespace:Nasag.Helpers"
+        xmlns:vm="clr-namespace:Nasag.ViewModels.Licensing"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:UpdateViewModel}"
+        Title="التحديثات"
+        Width="480"
+        Height="360"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FlowDirection="RightToLeft"
+        Loaded="OnWindowLoaded">
+
+    <Window.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBoolConverter x:Key="InverseBool" />
+    </Window.Resources>
+
+    <Border CornerRadius="14"
+            Background="{StaticResource CardSurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            Margin="16">
+        <Border.Effect>
+            <DropShadowEffect Color="#1B3A57" BlurRadius="36" ShadowDepth="0" Opacity="0.22" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Padding="22,18"
+                    Background="Transparent"
+                    MouseLeftButtonDown="OnHeaderDrag">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="40" Height="40" CornerRadius="20"
+                            Background="{StaticResource InfoSoftBrush}"
+                            VerticalAlignment="Center">
+                        <Path Data="{StaticResource IconDownload}"
+                              Stroke="{StaticResource InfoBrush}"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="20" Height="20" />
+                    </Border>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="التحديثات"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="{StaticResource FontSizeLg}"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Style="{StaticResource MutedTextStyle}"
+                                   FontSize="{StaticResource FontSizeSm}"
+                                   Margin="0,2,0,0">
+                            <Run Text="الإصدار الحالي:" />
+                            <Run Text="{Binding CurrentVersion}" />
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Body -->
+            <Grid Grid.Row="1" Margin="22,8,22,16">
+                <!-- Checking -->
+                <StackPanel Visibility="{Binding IsChecking, Converter={StaticResource BoolToVisibility}}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid Width="28" Height="28" HorizontalAlignment="Center">
+                        <Path Data="M12 2 a10 10 0 0 1 10 10"
+                              Stroke="{StaticResource TealPrimaryBrush}"
+                              StrokeThickness="2.4"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <RotateTransform x:Name="SpinnerRotate" Angle="0" />
+                            </Path.RenderTransform>
+                            <Path.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetName="SpinnerRotate"
+                                                             Storyboard.TargetProperty="Angle"
+                                                             From="0" To="360" Duration="0:0:1.1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Path.Triggers>
+                        </Path>
+                    </Grid>
+                    <TextBlock Text="جاري التحقق من التحديثات..."
+                               Style="{StaticResource BodyTextStyle}"
+                               HorizontalAlignment="Center"
+                               Margin="0,12,0,0" />
+                </StackPanel>
+
+                <!-- No update -->
+                <StackPanel Visibility="{Binding CheckedNoUpdate, Converter={StaticResource BoolToVisibility}}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Border Width="52" Height="52" CornerRadius="26"
+                            Background="{StaticResource SuccessSoftBrush}"
+                            HorizontalAlignment="Center">
+                        <Path Data="{StaticResource IconCheckCircle}"
+                              Stroke="{StaticResource SuccessBrush}"
+                              StrokeThickness="2"
+                              Fill="Transparent"
+                              Stretch="Uniform"
+                              Width="28" Height="28" />
+                    </Border>
+                    <TextBlock Style="{StaticResource BodyTextStyle}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Margin="0,12,0,0">
+                        <Run Text="أنت تستخدم أحدث نسخة" />
+                        <Run Text="(" /><Run Text="{Binding CurrentVersion}" /><Run Text=")" />
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Has update -->
+                <StackPanel Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVisibility}}"
+                            VerticalAlignment="Center">
+                    <Border Style="{StaticResource CardBorder}" Padding="14,12">
+                        <StackPanel>
+                            <TextBlock Text="تتوفر نسخة جديدة"
+                                       FontWeight="Bold"
+                                       Style="{StaticResource SubheadTextStyle}" />
+                            <TextBlock Style="{StaticResource MutedTextStyle}"
+                                       Margin="0,4,0,0">
+                                <Run Text="الإصدار الجديد:" />
+                                <Run Text="{Binding NewVersion}" FontWeight="Bold" />
+                            </TextBlock>
+                            <TextBlock Text="{Binding ReleaseNotes}"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,6,0,0"
+                                       Visibility="{Binding ReleaseNotes, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Download progress -->
+                    <StackPanel Margin="0,12,0,0"
+                                Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Style="{StaticResource CaptionTextStyle}">
+                            <Run Text="جاري التنزيل…" />
+                            <Run Text="{Binding Progress}" /><Run Text="%" />
+                        </TextBlock>
+                        <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="100" Height="8" Margin="0,6,0,0" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Error banner -->
+                <Border Background="{StaticResource DangerSoftBrush}"
+                        BorderBrush="{StaticResource DangerBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="14,10"
+                        VerticalAlignment="Bottom"
+                        Visibility="{Binding ErrorMessage, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="{StaticResource DangerBrush}"
+                               TextWrapping="Wrap" />
+                </Border>
+            </Grid>
+
+            <!-- Footer -->
+            <Border Grid.Row="2"
+                    Background="{StaticResource BackgroundBrush}"
+                    CornerRadius="0,0,14,14"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="22,14">
+                <Grid FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Style="{StaticResource GhostButton}"
+                            Command="{Binding CloseCommand}"
+                            Padding="18,8"
+                            Content="إغلاق" />
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" FlowDirection="LeftToRight">
+                        <!-- Download button: shown when update available but not downloaded yet -->
+                        <Button Command="{Binding DownloadCommand}"
+                                Padding="22,8"
+                                Content="حمّل وحدّث">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding HasUpdate}" Value="True" />
+                                                <Condition Binding="{Binding IsDownloaded}" Value="False" />
+                                                <Condition Binding="{Binding IsDownloading}" Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <!-- Apply button: shown after download -->
+                        <Button Command="{Binding ApplyAndRestartCommand}"
+                                Padding="22,8"
+                                Content="أعد التشغيل والتحديث">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsDownloaded}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

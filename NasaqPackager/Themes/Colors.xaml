@@ -1,0 +1,59 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="NavySidebarColor">#0E2A47</Color>
+    <Color x:Key="NavyDeepColor">#1B3A57</Color>
+    <Color x:Key="NavyHoverColor">#163252</Color>
+
+    <Color x:Key="TealPrimaryColor">#1FB5A8</Color>
+    <Color x:Key="TealHoverColor">#19A294</Color>
+    <Color x:Key="TealPressedColor">#138A7E</Color>
+    <Color x:Key="TealSoftColor">#E6F7F5</Color>
+
+    <Color x:Key="BackgroundColor">#F5F7FB</Color>
+    <Color x:Key="CardSurfaceColor">#FFFFFF</Color>
+    <Color x:Key="BorderColor">#E5E9F0</Color>
+    <Color x:Key="BorderStrongColor">#CFD6E0</Color>
+
+    <Color x:Key="TextPrimaryColor">#1B3A57</Color>
+    <Color x:Key="TextSecondaryColor">#6B7A8F</Color>
+    <Color x:Key="TextMutedColor">#9AA6B5</Color>
+    <Color x:Key="TextOnNavyColor">#FFFFFF</Color>
+    <Color x:Key="TextOnPrimaryColor">#FFFFFF</Color>
+
+    <Color x:Key="SuccessColor">#22C55E</Color>
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="DangerColor">#EF4444</Color>
+    <Color x:Key="InfoColor">#3B82F6</Color>
+
+    <SolidColorBrush x:Key="NavySidebarBrush" Color="{StaticResource NavySidebarColor}" />
+    <SolidColorBrush x:Key="NavyDeepBrush" Color="{StaticResource NavyDeepColor}" />
+    <SolidColorBrush x:Key="NavyHoverBrush" Color="{StaticResource NavyHoverColor}" />
+
+    <SolidColorBrush x:Key="TealPrimaryBrush" Color="{StaticResource TealPrimaryColor}" />
+    <SolidColorBrush x:Key="TealHoverBrush" Color="{StaticResource TealHoverColor}" />
+    <SolidColorBrush x:Key="TealPressedBrush" Color="{StaticResource TealPressedColor}" />
+    <SolidColorBrush x:Key="TealSoftBrush" Color="{StaticResource TealSoftColor}" />
+
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
+    <SolidColorBrush x:Key="CardSurfaceBrush" Color="{StaticResource CardSurfaceColor}" />
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
+    <SolidColorBrush x:Key="BorderStrongBrush" Color="{StaticResource BorderStrongColor}" />
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}" />
+    <SolidColorBrush x:Key="TextOnNavyBrush" Color="{StaticResource TextOnNavyColor}" />
+    <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="{StaticResource TextOnPrimaryColor}" />
+
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}" />
+
+    <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">10</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">14</CornerRadius>
+
+</ResourceDictionary>

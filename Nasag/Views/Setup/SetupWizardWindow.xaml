@@ -1,0 +1,855 @@
+<Window x:Class="Nasag.Views.Setup.SetupWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:controls="clr-namespace:Nasag.Controls"
+        xmlns:helpers="clr-namespace:Nasag.Helpers"
+        xmlns:vm="clr-namespace:Nasag.ViewModels.Setup"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:SetupWizardViewModel}"
+        Title="معالج إعداد قاعدة البيانات"
+        Width="720"
+        Height="720"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FlowDirection="RightToLeft"
+        Loaded="OnWindowLoaded">
+
+    <Window.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+        <helpers:InverseBoolConverter x:Key="InverseBool" />
+    </Window.Resources>
+
+    <Border CornerRadius="14"
+            Background="{StaticResource CardSurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            Margin="16">
+        <Border.Effect>
+            <DropShadowEffect Color="#1B3A57" BlurRadius="36" ShadowDepth="0" Opacity="0.22" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- ═══════════════ Header (drag region) ═══════════════ -->
+            <Border Grid.Row="0"
+                    x:Name="HeaderBar"
+                    Padding="22,18,22,8"
+                    Background="Transparent"
+                    MouseLeftButtonDown="OnHeaderDrag">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="44" Height="44"
+                                CornerRadius="22"
+                                Background="{StaticResource TealSoftBrush}"
+                                VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconBackup}"
+                                  Stroke="{StaticResource TealPressedBrush}"
+                                  StrokeThickness="2"
+                                  Fill="Transparent"
+                                  Stretch="Uniform"
+                                  Width="22" Height="22" />
+                        </Border>
+                        <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="معالج إعداد قاعدة البيانات"
+                                       FontFamily="{StaticResource TajawalFont}"
+                                       FontSize="{StaticResource FontSizeLg}"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" />
+                            <TextBlock Text="{Binding StepIndicatorText}"
+                                       Style="{StaticResource MutedTextStyle}"
+                                       FontSize="{StaticResource FontSizeSm}"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Style="{StaticResource IconButton}"
+                            Command="{Binding CancelCommand}"
+                            ToolTip="إغلاق"
+                            VerticalAlignment="Top">
+                        <TextBlock Text="✕"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- ═══════════════ Stepper dots ═══════════════ -->
+            <Border Grid.Row="1" Padding="22,0,22,12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Ellipse Width="10" Height="10" Margin="4,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep0Active}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <Border Width="22" Height="2" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep1Active}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                    <Ellipse Width="10" Height="10" Margin="0,0,4,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep1Active}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <Border Width="22" Height="2" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep2Active}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                    <Ellipse Width="10" Height="10" Margin="0,0,4,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep2Active}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <Border Width="22" Height="2" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep3Active}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                    <Ellipse Width="10" Height="10" Margin="0,0,4,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep3Active}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <Border Width="22" Height="2" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep4Active}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                    <Ellipse Width="10" Height="10">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource BorderStrongBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStep4Active}" Value="True">
+                                        <Setter Property="Fill" Value="{StaticResource TealPrimaryBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                </StackPanel>
+            </Border>
+
+            <!-- ═══════════════ Body (scrollable) ═══════════════ -->
+            <ScrollViewer Grid.Row="2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="22,6,22,18">
+                <Grid>
+
+                    <!-- ════ Step 0 — Welcome + Intent choice ════ -->
+                    <StackPanel Visibility="{Binding IsStep0, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="مرحباً بك في نَسَق"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,10,0,10" />
+                        <TextBlock Style="{StaticResource BodyTextStyle}"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   LineHeight="24"
+                                   Margin="0,0,0,18"
+                                   Text="قبل البدء، اختر إن كنت ستنشئ قاعدة بيانات نَسَق جديدة على خادم SQL Server، أو ستتصل بقاعدة بيانات نَسَق سبق إنشاؤها على هذا الجهاز أو على الشبكة." />
+
+                        <!-- Create new -->
+                        <RadioButton GroupName="IntentGroup"
+                                     IsChecked="{Binding IsCreateNew, Mode=OneWay}"
+                                     Cursor="Hand"
+                                     Margin="0,0,0,14"
+                                     Click="OnIntentCreateNewClick">
+                            <RadioButton.Template>
+                                <ControlTemplate TargetType="RadioButton">
+                                    <Border x:Name="Root"
+                                            CornerRadius="12"
+                                            Background="{StaticResource BackgroundBrush}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="2"
+                                            Padding="18,16">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="44" Height="44"
+                                                    CornerRadius="22"
+                                                    Background="{StaticResource TealSoftBrush}"
+                                                    VerticalAlignment="Top">
+                                                <Path Data="{StaticResource IconBackup}"
+                                                      Stroke="{StaticResource TealPressedBrush}"
+                                                      StrokeThickness="2"
+                                                      Fill="Transparent"
+                                                      Stretch="Uniform"
+                                                      Width="22" Height="22" />
+                                            </Border>
+                                            <StackPanel Margin="14,0,0,0">
+                                                <TextBlock Text="إنشاء قاعدة بيانات جديدة"
+                                                           FontWeight="Bold"
+                                                           Style="{StaticResource SubheadTextStyle}" />
+                                                <TextBlock Style="{StaticResource MutedTextStyle}"
+                                                           FontSize="{StaticResource FontSizeSm}"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,4,0,0"
+                                                           Text="أنشئ قاعدة بيانات نَسَق جديدة على الخادم. مناسب للتشغيل لأول مرة." />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource TealPrimaryBrush}" />
+                                            <Setter TargetName="Root" Property="Background" Value="{StaticResource TealSoftBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource TealPrimaryBrush}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </RadioButton.Template>
+                        </RadioButton>
+
+                        <!-- Use existing -->
+                        <RadioButton GroupName="IntentGroup"
+                                     IsChecked="{Binding IsUseExisting, Mode=OneWay}"
+                                     Cursor="Hand"
+                                     Click="OnIntentUseExistingClick">
+                            <RadioButton.Template>
+                                <ControlTemplate TargetType="RadioButton">
+                                    <Border x:Name="Root"
+                                            CornerRadius="12"
+                                            Background="{StaticResource BackgroundBrush}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="2"
+                                            Padding="18,16">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="44" Height="44"
+                                                    CornerRadius="22"
+                                                    Background="{StaticResource InfoSoftBrush}"
+                                                    VerticalAlignment="Top">
+                                                <Path Data="{StaticResource IconSettings}"
+                                                      Stroke="{StaticResource InfoBrush}"
+                                                      StrokeThickness="1.8"
+                                                      Fill="Transparent"
+                                                      Stretch="Uniform"
+                                                      Width="22" Height="22" />
+                                            </Border>
+                                            <StackPanel Margin="14,0,0,0">
+                                                <TextBlock Text="الاتصال بقاعدة بيانات موجودة"
+                                                           FontWeight="Bold"
+                                                           Style="{StaticResource SubheadTextStyle}" />
+                                                <TextBlock Style="{StaticResource MutedTextStyle}"
+                                                           FontSize="{StaticResource FontSizeSm}"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,4,0,0"
+                                                           Text="اتصل بقاعدة بيانات نَسَق سبق إنشاؤها على هذا الجهاز أو على خادم شبكة." />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource TealPrimaryBrush}" />
+                                            <Setter TargetName="Root" Property="Background" Value="{StaticResource TealSoftBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource TealPrimaryBrush}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </RadioButton.Template>
+                        </RadioButton>
+                    </StackPanel>
+
+                    <!-- ════ Step 1 — Server + Auth ════ -->
+                    <StackPanel Visibility="{Binding IsStep1, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="الخادم والمصادقة"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,4,0,4" />
+                        <TextBlock Style="{StaticResource MutedTextStyle}"
+                                   Text="اختر خادم SQL Server من القائمة (أو أدخل اسمه يدوياً) ثم حدد نوع المصادقة."
+                                   Margin="0,0,0,16" />
+
+                        <TextBlock Text="اختر الخادم" Style="{StaticResource FieldLabel}" />
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <controls:SearchableComboBox Grid.Column="0"
+                                                         ItemsSource="{Binding Servers}"
+                                                         SelectedItem="{Binding SelectedServer, Mode=TwoWay}"
+                                                         DisplayMemberPath="DisplayName"
+                                                         Placeholder="اختر الخادم…" />
+                            <Button Grid.Column="1"
+                                    Style="{StaticResource BubbleButton}"
+                                    Command="{Binding DiscoverServersCommand}"
+                                    IsEnabled="{Binding IsDiscoveringServers, Converter={StaticResource InverseBool}}"
+                                    Margin="8,0,0,0"
+                                    Padding="14,8"
+                                    ToolTip="تحديث قائمة الخوادم">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconRefresh}"
+                                          Stroke="White"
+                                          StrokeThickness="2"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Width="14" Height="14"
+                                          VerticalAlignment="Center" />
+                                    <TextBlock Text="تحديث القائمة"
+                                               Margin="6,0,0,0"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                        <TextBlock Text="{Binding DiscoveryStatusText}"
+                                   Style="{StaticResource CaptionTextStyle}"
+                                   Margin="0,0,0,14" />
+
+                        <TextBlock Text="أو أدخل اسم الخادم يدوياً" Style="{StaticResource FieldLabel}" />
+                        <TextBox Text="{Binding ServerNameInput, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="10,6"
+                                 Margin="0,0,0,16" />
+
+                        <TextBlock Text="نوع المصادقة" Style="{StaticResource FieldLabel}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,10">
+                            <RadioButton GroupName="AuthGroup"
+                                         Content="Windows (Trusted_Connection)"
+                                         IsChecked="{Binding IsWindowsAuth, Mode=OneWay}"
+                                         VerticalContentAlignment="Center"
+                                         Margin="0,0,18,0"
+                                         Click="OnAuthWindowsClick" />
+                            <RadioButton GroupName="AuthGroup"
+                                         Content="SQL Server (اسم مستخدم وكلمة مرور)"
+                                         IsChecked="{Binding IsSqlAuth, Mode=OneWay}"
+                                         VerticalContentAlignment="Center"
+                                         Click="OnAuthSqlClick" />
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsSqlAuth, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="اسم المستخدم" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                                     Padding="10,6"
+                                     Margin="0,0,0,10" />
+
+                            <TextBlock Text="كلمة المرور" Style="{StaticResource FieldLabel}" />
+                            <PasswordBox x:Name="PasswordField"
+                                         Padding="10,6"
+                                         Margin="0,0,0,4"
+                                         Loaded="OnPasswordFieldLoaded"
+                                         IsVisibleChanged="OnPasswordFieldVisibleChanged"
+                                         PasswordChanged="OnPasswordChanged" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- ════ Step 2 — Database ════ -->
+                    <StackPanel Visibility="{Binding IsStep2, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="{Binding Step2TitleText}"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,4,0,4" />
+
+                        <!-- UseExisting: pick from a list -->
+                        <StackPanel Visibility="{Binding IsUseExisting, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Style="{StaticResource MutedTextStyle}"
+                                       Text="اختر قاعدة البيانات التي تريد الاتصال بها من القائمة المسحوبة من الخادم."
+                                       Margin="0,0,0,16" />
+
+                            <TextBlock Text="قاعدة البيانات" Style="{StaticResource FieldLabel}" />
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <controls:SearchableComboBox Grid.Column="0"
+                                                             ItemsSource="{Binding Databases}"
+                                                             SelectedItem="{Binding SelectedDatabase, Mode=TwoWay}"
+                                                             Placeholder="اختر قاعدة البيانات…" />
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource BubbleButton}"
+                                        Command="{Binding LoadDatabasesCommand}"
+                                        IsEnabled="{Binding IsLoadingDatabases, Converter={StaticResource InverseBool}}"
+                                        Margin="8,0,0,0"
+                                        Padding="14,8"
+                                        ToolTip="تحديث قائمة القواعد">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconRefresh}"
+                                              Stroke="White"
+                                              StrokeThickness="2"
+                                              Fill="Transparent"
+                                              Stretch="Uniform"
+                                              Width="14" Height="14"
+                                              VerticalAlignment="Center" />
+                                        <TextBlock Text="تحديث"
+                                                   Margin="6,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <TextBlock Text="جاري تحميل القائمة…"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       Margin="0,0,0,8"
+                                       Visibility="{Binding IsLoadingDatabases, Converter={StaticResource BoolToVisibility}}" />
+
+                            <!-- Fallback banner + manual entry on error -->
+                            <Border CornerRadius="10"
+                                    Background="{StaticResource WarningSoftBrush}"
+                                    BorderBrush="{StaticResource WarningBrush}"
+                                    BorderThickness="1"
+                                    Padding="14,10"
+                                    Margin="0,8,0,10"
+                                    Visibility="{Binding HasDatabaseListError, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="{Binding DatabaseListError}"
+                                           Foreground="{StaticResource WarningBrush}"
+                                           TextWrapping="Wrap" />
+                            </Border>
+
+                            <TextBlock Text="أو أدخل اسم قاعدة البيانات يدوياً"
+                                       Style="{StaticResource FieldLabel}"
+                                       Margin="0,8,0,6" />
+                            <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}"
+                                     Padding="10,6"
+                                     Margin="0,0,0,4" />
+                        </StackPanel>
+
+                        <!-- CreateNew: enter a name -->
+                        <StackPanel Visibility="{Binding IsCreateNew, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Style="{StaticResource MutedTextStyle}"
+                                       Text="أدخل اسماً لقاعدة البيانات الجديدة التي ستُنشأ على الخادم."
+                                       Margin="0,0,0,16" />
+
+                            <TextBlock Text="اسم قاعدة البيانات" Style="{StaticResource FieldLabel}" />
+                            <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}"
+                                     Padding="10,6"
+                                     Margin="0,0,0,6" />
+                            <TextBlock Style="{StaticResource CaptionTextStyle}"
+                                       TextWrapping="Wrap"
+                                       Text="يُسمح بالأحرف اللاتينية والأرقام و _ و - فقط (≤ 128 حرفاً)." />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- ════ Step 3 — Test (and Create when needed) ════ -->
+                    <StackPanel Visibility="{Binding IsStep3, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="اختبار الاتصال"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,4,0,4" />
+                        <TextBlock Style="{StaticResource MutedTextStyle}"
+                                   Text="اضغط الزر التالي للتحقق من الوصول إلى الخادم وقاعدة البيانات."
+                                   Margin="0,0,0,16" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    Command="{Binding RunTestActionCommand}"
+                                    IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBool}}"
+                                    Padding="24,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconRefresh}"
+                                          Stroke="White"
+                                          StrokeThickness="2"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Width="16" Height="16"
+                                          VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding TestActionButtonText}"
+                                               Margin="8,0,0,0"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Inline spinner (rotating arc) while testing -->
+                            <Grid Width="22" Height="22"
+                                  Margin="12,0,0,0"
+                                  VerticalAlignment="Center"
+                                  Visibility="{Binding IsTesting, Converter={StaticResource BoolToVisibility}}">
+                                <Path Data="M12 2 a10 10 0 0 1 10 10"
+                                      Stroke="{StaticResource TealPrimaryBrush}"
+                                      StrokeThickness="2.4"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Fill="Transparent"
+                                      Stretch="Uniform"
+                                      RenderTransformOrigin="0.5,0.5">
+                                    <Path.RenderTransform>
+                                        <RotateTransform x:Name="SpinnerRotate" Angle="0" />
+                                    </Path.RenderTransform>
+                                    <Path.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever">
+                                                    <DoubleAnimation Storyboard.TargetName="SpinnerRotate"
+                                                                     Storyboard.TargetProperty="Angle"
+                                                                     From="0" To="360" Duration="0:0:1.1" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Path.Triggers>
+                                </Path>
+                            </Grid>
+
+                            <TextBlock Text="جاري الاختبار…"
+                                       Style="{StaticResource MutedTextStyle}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,0,0"
+                                       Visibility="{Binding IsTesting, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+
+                        <!-- Result banner -->
+                        <Border CornerRadius="10"
+                                Padding="14,12"
+                                Margin="0,0,0,8"
+                                Visibility="{Binding HasTestResult, Converter={StaticResource BoolToVisibility}}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{StaticResource DangerSoftBrush}" />
+                                    <Setter Property="BorderBrush" Value="{StaticResource DangerBrush}" />
+                                    <Setter Property="BorderThickness" Value="1" />
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding TestResultIsSuccess}" Value="True" />
+                                                <Condition Binding="{Binding TestDatabaseExists}" Value="True" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Background" Value="{StaticResource SuccessSoftBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource SuccessBrush}" />
+                                        </MultiDataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding TestResultIsSuccess}" Value="True" />
+                                                <Condition Binding="{Binding TestDatabaseExists}" Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <TextBlock Text="{Binding TestResultMessage}"
+                                           FontWeight="SemiBold"
+                                           TextWrapping="Wrap">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource BodyTextStyle}">
+                                            <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding TestResultIsSuccess}" Value="True" />
+                                                        <Condition Binding="{Binding TestDatabaseExists}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding TestResultIsSuccess}" Value="True" />
+                                                        <Condition Binding="{Binding TestDatabaseExists}" Value="False" />
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <Button Style="{StaticResource GhostButton}"
+                                        Command="{Binding ToggleDetailsCommand}"
+                                        Margin="0,8,0,0"
+                                        HorizontalAlignment="Right"
+                                        Padding="8,4"
+                                        Visibility="{Binding HasTestDetails, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="إظهار/إخفاء التفاصيل التقنية"
+                                               FontSize="{StaticResource FontSizeSm}" />
+                                </Button>
+
+                                <Border Background="{StaticResource BackgroundBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="10,8"
+                                        Margin="0,6,0,0"
+                                        Visibility="{Binding ShowTestDetails, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="{Binding TestDetails}"
+                                               FontFamily="Consolas"
+                                               FontSize="12"
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Style="{StaticResource CaptionTextStyle}"
+                                   TextWrapping="Wrap"
+                                   Text="لا يمكن المتابعة إلا بعد نجاح الاتصال والتأكد من وجود قاعدة البيانات." />
+                    </StackPanel>
+
+                    <!-- ════ Step 4 — Display name + Summary ════ -->
+                    <StackPanel Visibility="{Binding IsStep4, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="اسم العرض والحفظ"
+                                   FontFamily="{StaticResource TajawalFont}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,4,0,4" />
+                        <TextBlock Style="{StaticResource MutedTextStyle}"
+                                   Text="أعطِ هذا الاتصال اسماً واضحاً يظهر في شاشة الدخول، ثم احفظ وأعد التشغيل."
+                                   Margin="0,0,0,16" />
+
+                        <TextBlock Text="اسم القاعدة (يظهر في شاشة الدخول)" Style="{StaticResource FieldLabel}" />
+                        <TextBox Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"
+                                 Tag="مثال: مدرسة النور — رئيسي"
+                                 Padding="10,6"
+                                 Margin="0,0,0,16" />
+
+                        <!-- حساب المدير الأول — يظهر فقط عند إنشاء قاعدة جديدة -->
+                        <StackPanel Visibility="{Binding IsCreateNew, Converter={StaticResource BoolToVisibility}}"
+                                    Margin="0,0,0,16">
+                            <Border Style="{StaticResource CardBorder}" Padding="16,14">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <Border Width="32" Height="32"
+                                                CornerRadius="16"
+                                                Background="{StaticResource TealSoftBrush}"
+                                                VerticalAlignment="Center">
+                                            <Path Data="{StaticResource IconUser}"
+                                                  Stroke="{StaticResource TealPressedBrush}"
+                                                  StrokeThickness="2"
+                                                  Fill="Transparent"
+                                                  Stretch="Uniform"
+                                                  Width="16" Height="16" />
+                                        </Border>
+                                        <TextBlock Text="حساب المدير الأول"
+                                                   FontWeight="Bold"
+                                                   Style="{StaticResource SubheadTextStyle}"
+                                                   Margin="10,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="ستُنشأ قاعدة بيانات فارغة، وسيكون هذا الحساب هو المدير الرئيسي للنظام."
+                                               Style="{StaticResource MutedTextStyle}"
+                                               FontSize="{StaticResource FontSizeSm}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,12" />
+
+                                    <TextBlock Text="الاسم الكامل" Style="{StaticResource FieldLabel}" />
+                                    <TextBox Text="{Binding AdminFullName, UpdateSourceTrigger=PropertyChanged}"
+                                             MaxLength="80"
+                                             Padding="10,6"
+                                             Margin="0,0,0,10" />
+
+                                    <TextBlock Text="اسم المستخدم" Style="{StaticResource FieldLabel}" />
+                                    <TextBox Text="{Binding AdminUsername, UpdateSourceTrigger=PropertyChanged}"
+                                             MaxLength="60"
+                                             Padding="10,6"
+                                             Margin="0,0,0,10" />
+
+                                    <TextBlock Text="كلمة المرور" Style="{StaticResource FieldLabel}" />
+                                    <PasswordBox x:Name="AdminPasswordBox"
+                                                 MaxLength="60"
+                                                 Padding="10,6"
+                                                 Margin="0,0,0,10"
+                                                 Loaded="OnAdminPasswordLoaded"
+                                                 PasswordChanged="OnAdminPasswordChanged" />
+
+                                    <TextBlock Text="تأكيد كلمة المرور" Style="{StaticResource FieldLabel}" />
+                                    <PasswordBox x:Name="AdminConfirmPasswordBox"
+                                                 MaxLength="60"
+                                                 Padding="10,6"
+                                                 Margin="0,0,0,6"
+                                                 Loaded="OnAdminConfirmPasswordLoaded"
+                                                 PasswordChanged="OnAdminConfirmPasswordChanged" />
+
+                                    <TextBlock Text="يجب أن تتطابق كلمتا المرور وألا تقل عن 6 أحرف."
+                                               Style="{StaticResource CaptionTextStyle}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,0" />
+
+                                    <!-- رسالة تحقّق ديناميكية -->
+                                    <Border Background="{StaticResource DangerSoftBrush}"
+                                            BorderBrush="{StaticResource DangerBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="10,6"
+                                            Margin="0,8,0,0"
+                                            Visibility="{Binding HasAdminValidationError, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="{Binding AdminValidationError}"
+                                                   Foreground="{StaticResource DangerBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <Border Style="{StaticResource CardBorder}" Padding="16,14">
+                            <StackPanel>
+                                <TextBlock Text="الاسم الظاهر" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="{Binding DisplayName}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           Margin="0,0,0,12" />
+
+                                <TextBlock Text="الخادم" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="{Binding SummaryDataSource}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           Margin="0,0,0,12" />
+
+                                <TextBlock Text="قاعدة البيانات" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="{Binding SummaryDatabase}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           Margin="0,0,0,12" />
+
+                                <TextBlock Text="نوع المصادقة" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="{Binding SummaryAuthMode}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           Margin="0,0,0,12" />
+
+                                <TextBlock Text="سلسلة الاتصال" Style="{StaticResource FieldLabel}" />
+                                <Border Background="{StaticResource BackgroundBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="10,8"
+                                        Margin="0,0,0,4">
+                                    <TextBlock Text="{Binding SummaryConnectionString}"
+                                               FontFamily="Consolas"
+                                               FontSize="12"
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextSecondaryBrush}" />
+                                </Border>
+                                <TextBlock Style="{StaticResource CaptionTextStyle}"
+                                           Text="(يتم إخفاء كلمة المرور بعلامة ***)" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{StaticResource InfoSoftBrush}"
+                                CornerRadius="10"
+                                Padding="14,10"
+                                Margin="0,14,0,0">
+                            <TextBlock Foreground="{StaticResource InfoBrush}"
+                                       TextWrapping="Wrap"
+                                       Text="بعد الحفظ، سيُعاد تشغيل البرنامج تلقائياً لتطبيق إعدادات الاتصال الجديدة." />
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- ═══════════════ Footer ═══════════════ -->
+            <Border Grid.Row="3"
+                    Background="{StaticResource BackgroundBrush}"
+                    CornerRadius="0,0,14,14"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="22,14">
+                <Grid FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Style="{StaticResource GhostButton}"
+                            Command="{Binding CancelCommand}"
+                            Padding="18,8"
+                            Content="إلغاء" />
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                FlowDirection="LeftToRight">
+                        <Button Style="{StaticResource SecondaryButton}"
+                                Command="{Binding PrevStepCommand}"
+                                IsEnabled="{Binding IsFirstStep, Converter={StaticResource InverseBool}}"
+                                Padding="20,8"
+                                Margin="0,0,10,0"
+                                Content="السابق" />
+                        <Button x:Name="NextButton"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding NextStepCommand}"
+                                IsEnabled="{Binding CanGoNext}"
+                                Padding="22,8"
+                                Content="{Binding NextButtonText}"
+                                IsDefault="True" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
